@@ -8,10 +8,10 @@ Wants=network.target
 Type=simple
 User=pi
 Group=pi
-WorkingDirectory=/opt/storyteller
-Environment=PATH=/opt/storyteller/venv/bin:/usr/local/bin:/usr/bin:/bin
-Environment=PYTHONPATH=/opt/storyteller
-ExecStart=/bin/bash -c 'source /opt/storyteller/venv/bin/activate && python -m storyteller.main run --daemon'
+WorkingDirectory=/home/pi/BedtimeStoryTeller
+Environment=PATH=/home/pi/BedtimeStoryTeller/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/home/pi/BedtimeStoryTeller
+ExecStart=/bin/bash -c 'source /home/pi/BedtimeStoryTeller/venv/bin/activate && python -m storyteller.main run --daemon'
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 KillMode=mixed

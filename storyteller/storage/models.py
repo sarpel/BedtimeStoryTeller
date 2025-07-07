@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship, selectinload
 from sqlalchemy.sql import func
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 import aiosqlite
 
 logger = logging.getLogger(__name__)
@@ -170,12 +170,13 @@ class StoryCreate(BaseModel):
     content: str = Field(..., min_length=10)
     prompt: Optional[str] = None
     summary: Optional[str] = None
-    language: str = Field(default="tr", regex=r"^(tr|en)$")
-    age_rating: str = Field(default="5+", regex=r"^\d+\+$")
+    language: str = Field(default="tr", pattern=r"^(tr|en)$")
+    age_rating: str = Field(default="5+", pattern=r"^\d+\+$")
     themes: List[str] = Field(default_factory=list)
     characters: List[str] = Field(default_factory=list)
     
-    @validator('content')
+    @field_validator('content')
+    @classmethod
     def validate_content_length(cls, v):
         if len(v) > 10000:  # Reasonable limit for story length
             raise ValueError("Story content too long")
@@ -220,8 +221,8 @@ class StoryResponse(BaseModel):
 class SessionCreate(BaseModel):
     """Pydantic model for creating a story session."""
     prompt: str = Field(..., min_length=1)
-    language: str = Field(default="tr", regex=r"^(tr|en)$")
-    age_rating: str = Field(default="5+", regex=r"^\d+\+$")
+    language: str = Field(default="tr", pattern=r"^(tr|en)$")
+    age_rating: str = Field(default="5+", pattern=r"^\d+\+$")
     wakeword_trigger: Optional[str] = None
 
 
@@ -254,19 +255,21 @@ class ScheduledStoryCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     story_id: Optional[int] = None
     prompt: Optional[str] = None
-    schedule_time: str = Field(..., regex=r"^([01]?\d|2[0-3]):[0-5]\d$")
+    schedule_time: str = Field(..., pattern=r"^([01]?\d|2[0-3]):[0-5]\d$")
     days_of_week: List[int] = Field(..., min_items=1)
-    language: str = Field(default="tr", regex=r"^(tr|en)$")
-    age_rating: str = Field(default="5+", regex=r"^\d+\+$")
+    language: str = Field(default="tr", pattern=r"^(tr|en)$")
+    age_rating: str = Field(default="5+", pattern=r"^\d+\+$")
     volume: float = Field(default=0.7, ge=0.0, le=1.0)
     
-    @validator('days_of_week')
+    @field_validator('days_of_week')
+    @classmethod
     def validate_days(cls, v):
         if not all(0 <= day <= 6 for day in v):
             raise ValueError("Days of week must be between 0-6")
         return sorted(list(set(v)))  # Remove duplicates and sort
     
-    @validator('story_id', 'prompt')
+    @field_validator('story_id', 'prompt')
+    @classmethod
     def validate_story_or_prompt(cls, v, values):
         if not values.get('story_id') and not v:
             raise ValueError("Either story_id or prompt must be provided")
