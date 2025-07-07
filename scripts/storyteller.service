@@ -11,7 +11,7 @@ Group=pi
 WorkingDirectory=/home/pi/BedtimeStoryTeller
 Environment=PATH=/home/pi/BedtimeStoryTeller/venv/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONPATH=/home/pi/BedtimeStoryTeller
-ExecStart=/home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main run --daemon
+ExecStart=/bin/bash -c 'cd /home/pi/BedtimeStoryTeller && source venv/bin/activate && python -m storyteller.main run --daemon'
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 KillMode=mixed

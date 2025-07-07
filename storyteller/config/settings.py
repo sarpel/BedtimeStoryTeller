@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     )
     porcupine_access_key: Optional[str] = Field(default=None, env="PORCUPINE_ACCESS_KEY")
     porcupine_keywords: str = Field(default="porcupine", env="PORCUPINE_KEYWORDS")
+    porcupine_model_path: Optional[str] = Field(default=None, env="PORCUPINE_MODEL_PATH")
     openwakeword_model_path: Optional[str] = Field(
         default=None, env="OPENWAKEWORD_MODEL_PATH"
     )
@@ -104,6 +105,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
+        extra = "ignore"  # Ignore extra fields to prevent validation errors
     
     @field_validator("max_memory_mb")
     @classmethod
