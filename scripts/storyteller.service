@@ -11,24 +11,13 @@ Group=pi
 WorkingDirectory=/home/pi/BedtimeStoryTeller
 Environment=PATH=/home/pi/BedtimeStoryTeller/venv/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONPATH=/home/pi/BedtimeStoryTeller
-ExecStart=/bin/bash -c 'cd /home/pi/BedtimeStoryTeller && source venv/bin/activate && python -m storyteller.main run --daemon'
+ExecStart=/bin/bash -c 'source /home/pi/BedtimeStoryTeller/venv/bin/activate && python -m storyteller.main run --daemon'
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 KillMode=mixed
 TimeoutStopSec=30
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/home/pi/BedtimeStoryTeller
-ReadWritePaths=/var/log
-ReadWritePaths=/tmp
+# Simplified security settings for initial deployment
 NoNewPrivileges=true
-RestrictRealtime=true
-RestrictSUIDSGID=true
-LockPersonality=true
-MemoryDenyWriteExecute=false
-SystemCallFilter=@system-service
-SystemCallErrorNumber=EPERM
 
 # Hardware access for GPIO and audio
 DeviceAllow=/dev/gpiomem rw
