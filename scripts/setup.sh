@@ -57,9 +57,9 @@ check_root() {
 detect_pi_model() {
     local model=""
     if [ -f /proc/device-tree/model ]; then
-        model=$(cat /proc/device-tree/model)
+        model=$(cat /proc/device-tree/model | tr -d '\0')
     elif [ -f /proc/cpuinfo ]; then
-        model=$(grep "Model" /proc/cpuinfo | cut -d: -f2 | xargs)
+        model=$(grep "Model" /proc/cpuinfo | cut -d: -f2 | xargs | tr -d '\0')
     fi
     
     if [[ $model == *"Pi Zero 2"* ]]; then
