@@ -80,7 +80,7 @@ class StorySession(Base):
     llm_provider = Column(String(50), nullable=True)
     tts_provider = Column(String(50), nullable=True)
     error_message = Column(Text, nullable=True)
-    metadata = Column(JSON, default=dict)  # Additional session data
+    session_metadata = Column(JSON, default=dict)  # Additional session data
     
     # Relationships
     story = relationship("Story", back_populates="sessions")
@@ -151,7 +151,7 @@ class SystemEvent(Base):
     level = Column(String(20), default="info")  # debug, info, warning, error, critical
     component = Column(String(50), nullable=True)  # which component generated the event
     session_id = Column(String(50), nullable=True)  # related session if any
-    metadata = Column(JSON, default=dict)  # additional event data
+    event_metadata = Column(JSON, default=dict)  # additional event data
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     # Indexes
