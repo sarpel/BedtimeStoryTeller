@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Bedtime Storyteller{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Settings</h1>
+        <p class="lead">Configure your bedtime storyteller</p>
+    </div>
+</div>
+
+<!-- Settings Form -->
+<div class="row">
+    <div class="col-lg-8">
+        <form id="settingsForm">
+            
+            <!-- System Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> System Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="wakewordEngine" class="form-label">Wake Word Engine</label>
+                            <select class="form-select" id="wakewordEngine" name="wakeword_engine">
+                                <option value="porcupine">Porcupine</option>
+                                <option value="openwakeword">OpenWakeWord</option>
+                            </select>
+                            <div class="form-text">Engine used for wake word detection</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="maxMemory" class="form-label">Memory Limit (MB)</label>
+                            <input type="number" class="form-control" id="maxMemory" name="max_memory_mb" 
+                                   min="200" max="1000" value="400">
+                            <div class="form-text">Maximum memory usage limit</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Story Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-book"></i> Story Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="storyLanguage" class="form-label">Default Language</label>
+                            <select class="form-select" id="storyLanguage" name="story_language">
+                                <option value="tr">Turkish</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ageRating" class="form-label">Default Age Rating</label>
+                            <select class="form-select" id="ageRating" name="story_age_rating">
+                                <option value="3+">3+</option>
+                                <option value="5+">5+</option>
+                                <option value="8+">8+</option>
+                                <option value="10+">10+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="maxParagraphs" class="form-label">Max Paragraphs</label>
+                            <input type="number" class="form-control" id="maxParagraphs" name="story_max_paragraphs" 
+                                   min="3" max="20" value="10">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="contentSafety" name="content_safety_enabled">
+                                <label class="form-check-label" for="contentSafety">
+                                    Enable Content Safety Filtering
+                                </label>
+                                <div class="form-text">Filter inappropriate content from stories</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hardware Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-cpu"></i> Hardware Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="piModel" class="form-label">Pi Model</label>
+                            <select class="form-select" id="piModel" name="pi_model">
+                                <option value="">Auto-detect</option>
+                                <option value="pi_zero_2w">Pi Zero 2W</option>
+                                <option value="pi_4">Pi 4</option>
+                                <option value="pi_5">Pi 5</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="audioDevice" class="form-label">Audio Device</label>
+                            <select class="form-select" id="audioDevice" name="audio_device">
+                                <option value="">Auto-detect</option>
+                                <option value="iqaudio">IQAudio Codec</option>
+                                <option value="usb_audio">USB Audio</option>
+                                <option value="hdmi">HDMI Audio</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="buttonPin" class="form-label">Button GPIO Pin</label>
+                            <input type="number" class="form-control" id="buttonPin" name="gpio_button_pin" 
+                                   min="2" max="27" value="18">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ledPin" class="form-label">LED GPIO Pin</label>
+                            <input type="number" class="form-control" id="ledPin" name="gpio_led_pin" 
+                                   min="2" max="27" value="24">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Safety Settings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-shield-check"></i> Safety Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="maxStoryLength" class="form-label">Max Story Length</label>
+                            <input type="number" class="form-control" id="maxStoryLength" name="max_story_length" 
+                                   min="500" max="5000" value="2000">
+                            <div class="form-text">Maximum characters per story</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apiTimeout" class="form-label">API Timeout (seconds)</label>
+                            <input type="number" class="form-control" id="apiTimeout" name="api_timeout_seconds" 
+                                   min="10" max="120" value="30">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="forbiddenWords" class="form-label">Forbidden Words</label>
+                            <textarea class="form-control" id="forbiddenWords" name="forbidden_words" rows="3" 
+                                      placeholder="Enter forbidden words separated by commas"></textarea>
+                            <div class="form-text">Words that will be filtered from stories</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Save Button -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save"></i> Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- System Information -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle"></i> System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Version:</strong> 0.1.0
+                </div>
+                <div class="mb-3">
+                    <strong>Python Version:</strong> <span id="pythonVersion">Loading...</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Platform:</strong> <span id="platform">Loading...</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Memory Usage:</strong> <span id="memoryUsage">Loading...</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Uptime:</strong> <span id="uptime">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-tools"></i> System Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="testSystem()">
+                        <i class="bi bi-play-circle"></i> Test System
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="restartService()">
+                        <i class="bi bi-arrow-clockwise"></i> Restart Service
+                    </button>
+                    <button class="btn btn-outline-info" onclick="viewLogs()">
+                        <i class="bi bi-file-text"></i> View Logs
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="exportSettings()">
+                        <i class="bi bi-download"></i> Export Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Modal -->
+<div class="modal fade" id="logsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">System Logs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="logsContent" style="height: 400px; overflow-y: auto; background-color: #f8f9fa; padding: 10px;">
+Loading logs...
+                </pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="refreshLogs()">Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadSettings() {
+        fetch('/api/settings')
+            .then(response => response.json())
+            .then(settings => {
+                // Populate form fields
+                document.getElementById('wakewordEngine').value = settings.wakeword_engine || 'porcupine';
+                document.getElementById('maxMemory').value = settings.max_memory_mb || 400;
+                document.getElementById('storyLanguage').value = settings.story_language || 'tr';
+                document.getElementById('ageRating').value = settings.story_age_rating || '5+';
+                document.getElementById('maxParagraphs').value = settings.story_max_paragraphs || 10;
+                document.getElementById('contentSafety').checked = settings.content_safety_enabled || false;
+                
+                // Update system info
+                loadSystemInfo();
+            })
+            .catch(error => {
+                console.error('Settings load failed:', error);
+                showError('Failed to load settings');
+            });
+    }
+    
+    function loadSystemInfo() {
+        fetch('/api/status')
+            .then(response => response.json())
+            .then(status => {
+                // Update system information
+                document.getElementById('pythonVersion').textContent = status.python_version || 'Unknown';
+                document.getElementById('platform').textContent = status.platform || 'Unknown';
+                document.getElementById('memoryUsage').textContent = status.memory_usage || 'Unknown';
+                document.getElementById('uptime').textContent = status.uptime || 'Unknown';
+            })
+            .catch(error => {
+                console.error('System info load failed:', error);
+            });
+    }
+    
+    function saveSettings() {
+        const formData = new FormData(document.getElementById('settingsForm'));
+        const settings = {};
+        
+        for (let [key, value] of formData.entries()) {
+            if (key === 'content_safety_enabled') {
+                settings[key] = document.getElementById('contentSafety').checked;
+            } else {
+                settings[key] = value;
+            }
+        }
+        
+        fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            showNotification('Settings saved successfully', 'success');
+        })
+        .catch(error => {
+            console.error('Settings save failed:', error);
+            showError('Failed to save settings');
+        });
+    }
+    
+    function testSystem() {
+        showNotification('Running system test...', 'info');
+        
+        fetch('/api/test', { method: 'POST' })
+            .then(response => response.json())
+            .then(results => {
+                if (results.success) {
+                    showNotification('System test passed', 'success');
+                } else {
+                    showNotification('System test failed', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('System test failed:', error);
+                showError('System test failed');
+            });
+    }
+    
+    function restartService() {
+        if (!confirm('Are you sure you want to restart the service?')) {
+            return;
+        }
+        
+        fetch('/api/restart', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                showNotification('Service restart initiated', 'info');
+            })
+            .catch(error => {
+                console.error('Service restart failed:', error);
+                showError('Failed to restart service');
+            });
+    }
+    
+    function viewLogs() {
+        const modal = new bootstrap.Modal(document.getElementById('logsModal'));
+        modal.show();
+        refreshLogs();
+    }
+    
+    function refreshLogs() {
+        document.getElementById('logsContent').textContent = 'Loading logs...';
+        
+        fetch('/api/logs')
+            .then(response => response.text())
+            .then(logs => {
+                document.getElementById('logsContent').textContent = logs;
+            })
+            .catch(error => {
+                console.error('Logs load failed:', error);
+                document.getElementById('logsContent').textContent = 'Failed to load logs';
+            });
+    }
+    
+    function exportSettings() {
+        fetch('/api/settings')
+            .then(response => response.json())
+            .then(settings => {
+                const dataStr = JSON.stringify(settings, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = 'storyteller-settings.json';
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+            })
+            .catch(error => {
+                console.error('Settings export failed:', error);
+                showError('Failed to export settings');
+            });
+    }
+    
+    function showError(message) {
+        showNotification(message, 'danger');
+    }
+    
+    // Event listeners
+    document.getElementById('settingsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveSettings();
+    });
+    
+    // Load settings on page load
+    document.addEventListener('DOMContentLoaded', loadSettings);
+</script>
+{% endblock %}

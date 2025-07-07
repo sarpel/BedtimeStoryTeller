@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Bedtime Storyteller{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Dashboard</h1>
+        <p class="lead">Welcome to your bedtime storytelling control center</p>
+    </div>
+</div>
+
+<!-- System Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-cpu display-4 text-primary mb-3"></i>
+                <h5>System Status</h5>
+                <span class="badge status-badge bg-secondary" id="systemState">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-mic display-4 text-success mb-3"></i>
+                <h5>Wake Word</h5>
+                <span class="badge status-badge bg-secondary" id="wakewordStatus">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-book display-4 text-info mb-3"></i>
+                <h5>Stories Today</h5>
+                <h3 class="text-primary" id="storiesCount">0</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-memory display-4 text-warning mb-3"></i>
+                <h5>Memory Usage</h5>
+                <div class="progress mt-2">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" id="memoryBar"></div>
+                </div>
+                <small class="text-muted" id="memoryText">Loading...</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Session -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-play-circle"></i> Current Session
+                </h5>
+            </div>
+            <div class="card-body" id="currentSession">
+                <div class="text-center text-muted">
+                    <i class="bi bi-moon-stars display-4 mb-3"></i>
+                    <p>No active session</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hardware Status -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-speaker"></i> Hardware Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Audio Device:</strong>
+                        <span class="badge bg-secondary" id="audioDevice">Unknown</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>GPIO:</strong>
+                        <span class="badge bg-secondary" id="gpioStatus">Unknown</span>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <strong>Pi Model:</strong>
+                        <span class="badge bg-secondary" id="piModel">Unknown</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>Temperature:</strong>
+                        <span class="badge bg-secondary" id="temperature">Unknown</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-cloud"></i> Provider Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>LLM Provider:</strong>
+                        <span class="badge bg-secondary" id="llmProvider">Unknown</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>TTS Provider:</strong>
+                        <span class="badge bg-secondary" id="ttsProvider">Unknown</span>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <strong>API Status:</strong>
+                        <span class="badge bg-secondary" id="apiStatus">Unknown</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>Response Time:</strong>
+                        <span class="badge bg-secondary" id="responseTime">Unknown</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Stories -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history"></i> Recent Stories
+                </h5>
+                <a href="/stories" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Prompt</th>
+                                <th>Language</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentStories">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadDashboard() {
+        // Load system status
+        fetch('/api/status')
+            .then(response => response.json())
+            .then(data => {
+                updateSystemStatus(data);
+            })
+            .catch(error => {
+                console.error('Status load failed:', error);
+            });
+        
+        // Load recent stories
+        fetch('/api/stories?limit=5')
+            .then(response => response.json())
+            .then(data => {
+                updateRecentStories(data);
+            })
+            .catch(error => {
+                console.error('Stories load failed:', error);
+            });
+    }
+    
+    function updateSystemStatus(status) {
+        // Update system state
+        document.getElementById('systemState').textContent = status.state;
+        document.getElementById('systemState').className = `badge status-badge ${getStateClass(status.state)}`;
+        
+        // Update current session
+        const sessionDiv = document.getElementById('currentSession');
+        if (status.current_session) {
+            const session = status.current_session;
+            sessionDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Session: ${session.session_id}</h6>
+                        <p class="mb-1"><strong>Prompt:</strong> ${session.prompt}</p>
+                        <p class="mb-1"><strong>Language:</strong> ${session.language} | <strong>Age:</strong> ${session.age_rating}</p>
+                        <p class="mb-0"><strong>Started:</strong> ${new Date(session.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-primary">${session.status}</span>
+                        <div class="mt-2">
+                            <small class="text-muted">Paragraphs: ${session.paragraphs_generated}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            sessionDiv.innerHTML = `
+                <div class="text-center text-muted">
+                    <i class="bi bi-moon-stars display-4 mb-3"></i>
+                    <p>No active session</p>
+                </div>
+            `;
+        }
+        
+        // Update hardware status
+        if (status.hardware_status) {
+            const hw = status.hardware_status;
+            document.getElementById('audioDevice').textContent = hw.audio_device || 'Unknown';
+            document.getElementById('gpioStatus').textContent = hw.gpio_status || 'Unknown';
+            document.getElementById('piModel').textContent = hw.pi_model || 'Unknown';
+            document.getElementById('temperature').textContent = hw.temperature || 'Unknown';
+        }
+        
+        // Update provider status
+        if (status.provider_status) {
+            const providers = status.provider_status;
+            document.getElementById('llmProvider').textContent = providers.llm_provider || 'Unknown';
+            document.getElementById('ttsProvider').textContent = providers.tts_provider || 'Unknown';
+            document.getElementById('apiStatus').textContent = providers.overall_status || 'Unknown';
+            document.getElementById('responseTime').textContent = providers.response_time || 'Unknown';
+        }
+        
+        // Update stats
+        if (status.stats) {
+            document.getElementById('storiesCount').textContent = status.stats.stories_today || 0;
+            
+            if (status.stats.memory_usage) {
+                const memoryPercent = (status.stats.memory_usage / status.stats.memory_limit) * 100;
+                document.getElementById('memoryBar').style.width = `${memoryPercent}%`;
+                document.getElementById('memoryText').textContent = 
+                    `${status.stats.memory_usage}MB / ${status.stats.memory_limit}MB`;
+            }
+        }
+    }
+    
+    function updateRecentStories(stories) {
+        const tbody = document.getElementById('recentStories');
+        
+        if (stories.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No recent stories</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = stories.map(story => `
+            <tr>
+                <td>${new Date(story.created_at).toLocaleTimeString()}</td>
+                <td>${story.prompt.substring(0, 30)}${story.prompt.length > 30 ? '...' : ''}</td>
+                <td><span class="badge bg-info">${story.language}</span></td>
+                <td><span class="badge ${getStatusClass(story.status)}">${story.status}</span></td>
+                <td>${calculateDuration(story.created_at, story.completed_at)}</td>
+            </tr>
+        `).join('');
+    }
+    
+    function getStatusClass(status) {
+        switch (status) {
+            case 'completed': return 'bg-success';
+            case 'active': return 'bg-primary';
+            case 'failed': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+    
+    function calculateDuration(start, end) {
+        if (!end) return 'Active';
+        const duration = Math.floor((new Date(end) - new Date(start)) / 1000);
+        return `${duration}s`;
+    }
+    
+    // Load dashboard data on page load
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+{% endblock %}
