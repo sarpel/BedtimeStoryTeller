@@ -76,18 +76,35 @@ detect_pi_model() {
 detect_os() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
+        
+        # Check for DietPi specifically first
+        if [ -f /boot/dietpi/.version ] || [ -f /DietPi/dietpi/.version ] || [[ "$PRETTY_NAME" == *"DietPi"* ]]; then
+            echo "dietpi"
+            return
+        fi
+        
         case "$ID" in
             "dietpi")
                 echo "dietpi"
                 ;;
             "raspbian"|"debian")
-                echo "raspios"
+                # Double-check it's not DietPi masquerading as Debian
+                if [[ "$PRETTY_NAME" == *"DietPi"* ]] || [[ "$NAME" == *"DietPi"* ]]; then
+                    echo "dietpi"
+                else
+                    echo "raspios"
+                fi
                 ;;
             "ubuntu")
                 echo "ubuntu"
                 ;;
             *)
-                echo "$ID"
+                # Check if it's DietPi with a different ID
+                if [[ "$PRETTY_NAME" == *"DietPi"* ]] || [[ "$NAME" == *"DietPi"* ]]; then
+                    echo "dietpi"
+                else
+                    echo "$ID"
+                fi
                 ;;
         esac
     else
@@ -369,6 +386,13 @@ display_next_steps() {
 main() {
     log_info "Starting Bedtime Storyteller installation..."
     echo
+    
+    # Debug OS detection
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        log_info "OS Debug - ID: $ID, NAME: $NAME, PRETTY_NAME: $PRETTY_NAME"
+    fi
+    
     log_info "Detected OS: $(detect_os)"
     log_info "Detected Pi Model: $(detect_pi_model)"
     echo
