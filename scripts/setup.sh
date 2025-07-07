@@ -12,11 +12,21 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="bedtime-storyteller"
+PROJECT_NAME="BedtimeStoryTeller"
 SERVICE_NAME="storyteller"
-DEFAULT_USER="pi"
-DEFAULT_HOME="/home/${DEFAULT_USER}"
-INSTALL_DIR="${DEFAULT_HOME}/${PROJECT_NAME}"
+
+# Detect current user or use fallback
+if [ -n "$SUDO_USER" ]; then
+    TARGET_USER="$SUDO_USER"
+else
+    TARGET_USER="$(whoami)"
+    if [ "$TARGET_USER" = "root" ]; then
+        TARGET_USER="pi"  # Fallback for root execution
+    fi
+fi
+
+TARGET_HOME="$(eval echo ~$TARGET_USER)"
+INSTALL_DIR="${TARGET_HOME}/${PROJECT_NAME}"
 VENV_DIR="${INSTALL_DIR}/venv"
 LOG_DIR="/var/log/storyteller"
 
@@ -66,7 +76,20 @@ detect_pi_model() {
 detect_os() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
-        echo $ID
+        case "$ID" in
+            "dietpi")
+                echo "dietpi"
+                ;;
+            "raspbian"|"debian")
+                echo "raspios"
+                ;;
+            "ubuntu")
+                echo "ubuntu"
+                ;;
+            *)
+                echo "$ID"
+                ;;
+        esac
     else
         echo "unknown"
     fi
@@ -75,24 +98,29 @@ detect_os() {
 install_system_packages() {
     log_info "Installing system packages..."
     
+    local os_type=$(detect_os)
+    
     apt-get update
-    apt-get install -y \
-        python3 \
-        python3-pip \
-        python3-venv \
-        python3-dev \
-        git \
-        curl \
-        wget \
-        build-essential \
-        libasound2-dev \
-        portaudio19-dev \
-        libssl-dev \
-        libffi-dev \
-        sqlite3 \
-        systemd \
-        nginx \
-        supervisor
+    
+    # Base packages for all systems
+    local base_packages="python3 python3-pip python3-venv python3-dev git curl wget build-essential libasound2-dev portaudio19-dev libssl-dev libffi-dev sqlite3 systemd"
+    
+    # OS-specific packages
+    case "$os_type" in
+        "dietpi")
+            log_info "Installing packages for DietPi..."
+            apt-get install -y $base_packages
+            # DietPi is minimal, avoid unnecessary packages
+            ;;
+        "raspios")
+            log_info "Installing packages for Raspberry Pi OS..."
+            apt-get install -y $base_packages nginx
+            ;;
+        *)
+            log_info "Installing packages for $os_type..."
+            apt-get install -y $base_packages
+            ;;
+    esac
     
     # Pi-specific packages
     local pi_model=$(detect_pi_model)
@@ -119,9 +147,20 @@ setup_audio() {
         raspi-config nonint do_i2c 0
         raspi-config nonint do_spi 0
         
-        # Add IQAudio overlay to config.txt
-        if ! grep -q "dtoverlay=iqaudio-codec" /boot/config.txt; then
-            echo "dtoverlay=iqaudio-codec" >> /boot/config.txt
+        # Add IQAudio overlay to config.txt (check both possible locations)
+        local config_file=""
+        if [ -f "/boot/firmware/config.txt" ]; then
+            config_file="/boot/firmware/config.txt"
+        elif [ -f "/boot/config.txt" ]; then
+            config_file="/boot/config.txt"
+        else
+            log_error "Could not find config.txt file"
+            return 1
+        fi
+        
+        if ! grep -q "dtoverlay=iqaudio-codec" "$config_file"; then
+            echo "dtoverlay=iqaudio-codec" >> "$config_file"
+            log_info "Added IQAudio overlay to $config_file"
         fi
         
     elif [[ $pi_model == "pi_5" ]]; then
@@ -133,7 +172,7 @@ setup_audio() {
     fi
     
     # Ensure audio group permissions
-    usermod -a -G audio $DEFAULT_USER
+    usermod -a -G audio $TARGET_USER
     
     log_success "Audio system configured"
 }
@@ -142,7 +181,7 @@ setup_gpio() {
     log_info "Configuring GPIO access..."
     
     # Add user to gpio group
-    usermod -a -G gpio $DEFAULT_USER
+    usermod -a -G gpio $TARGET_USER
     
     # Set GPIO permissions
     if [ -f /dev/gpiomem ]; then
@@ -157,9 +196,9 @@ create_user_and_directories() {
     log_info "Setting up user and directories..."
     
     # Ensure user exists
-    if ! id "$DEFAULT_USER" &>/dev/null; then
-        useradd -m -s /bin/bash $DEFAULT_USER
-        log_info "Created user: $DEFAULT_USER"
+    if ! id "$TARGET_USER" &>/dev/null; then
+        useradd -m -s /bin/bash $TARGET_USER
+        log_info "Created user: $TARGET_USER"
     fi
     
     # Create directories
@@ -167,8 +206,8 @@ create_user_and_directories() {
     mkdir -p $LOG_DIR
     
     # Set ownership
-    chown -R $DEFAULT_USER:$DEFAULT_USER $INSTALL_DIR
-    chown -R $DEFAULT_USER:$DEFAULT_USER $LOG_DIR
+    chown -R $TARGET_USER:$TARGET_USER $INSTALL_DIR
+    chown -R $TARGET_USER:$TARGET_USER $LOG_DIR
     
     log_success "Directories created"
 }
@@ -177,7 +216,7 @@ install_python_dependencies() {
     log_info "Installing Python dependencies..."
     
     # Switch to user account for venv creation
-    sudo -u $DEFAULT_USER bash << EOF
+    sudo -u $TARGET_USER bash << EOF
 cd $INSTALL_DIR
 python3 -m venv venv
 source venv/bin/activate
@@ -193,15 +232,20 @@ configure_environment() {
     
     # Copy environment template
     if [ ! -f "$INSTALL_DIR/.env" ]; then
-        sudo -u $DEFAULT_USER cp "$INSTALL_DIR/.env.example" "$INSTALL_DIR/.env"
-        log_info "Created .env file from template"
+        if [ -f "$INSTALL_DIR/.env.example" ]; then
+            sudo -u $TARGET_USER cp "$INSTALL_DIR/.env.example" "$INSTALL_DIR/.env"
+            log_info "Created .env file from template"
+        else
+            log_error ".env.example file not found. Please ensure it exists in the project."
+            return 1
+        fi
     else
         log_warning ".env file already exists, skipping"
     fi
     
     # Set basic configuration based on detected hardware
     local pi_model=$(detect_pi_model)
-    sudo -u $DEFAULT_USER bash << EOF
+    sudo -u $TARGET_USER bash << EOF
 cd $INSTALL_DIR
 sed -i "s/PI_MODEL=.*/PI_MODEL=$pi_model/" .env
 EOF
@@ -217,8 +261,9 @@ install_systemd_service() {
     
     # Update service file with correct paths
     sed -i "s|/home/pi/bedtime-storyteller|$INSTALL_DIR|g" "/etc/systemd/system/storyteller.service"
-    sed -i "s|User=pi|User=$DEFAULT_USER|g" "/etc/systemd/system/storyteller.service"
-    sed -i "s|Group=pi|Group=$DEFAULT_USER|g" "/etc/systemd/system/storyteller.service"
+    sed -i "s|/home/pi/BedtimeStoryTeller|$INSTALL_DIR|g" "/etc/systemd/system/storyteller.service"
+    sed -i "s|User=pi|User=$TARGET_USER|g" "/etc/systemd/system/storyteller.service"
+    sed -i "s|Group=pi|Group=$TARGET_USER|g" "/etc/systemd/system/storyteller.service"
     
     # Reload systemd and enable service
     systemctl daemon-reload
@@ -228,6 +273,14 @@ install_systemd_service() {
 }
 
 setup_nginx() {
+    local os_type=$(detect_os)
+    
+    # Only install nginx on full systems, not on DietPi
+    if [[ "$os_type" == "dietpi" ]]; then
+        log_info "Skipping nginx setup on DietPi (using direct port access)"
+        return 0
+    fi
+    
     log_info "Configuring nginx reverse proxy..."
     
     # Create nginx configuration
@@ -270,7 +323,7 @@ run_initial_tests() {
     log_info "Running initial system tests..."
     
     # Test Python installation
-    sudo -u $DEFAULT_USER bash << 'EOF'
+    sudo -u $TARGET_USER bash << 'EOF'
 cd $INSTALL_DIR
 source venv/bin/activate
 python -c "import storyteller; print('Import successful')" || echo "Import failed (expected without dependencies)"
@@ -306,7 +359,7 @@ display_next_steps() {
     echo -e "   ${YELLOW}http://$(hostname -I | awk '{print $1}')/${NC}"
     echo
     echo -e "7. Test the system:"
-    echo -e "   ${YELLOW}sudo -u $DEFAULT_USER $INSTALL_DIR/venv/bin/python -m storyteller.main test${NC}"
+    echo -e "   ${YELLOW}sudo -u $TARGET_USER $INSTALL_DIR/venv/bin/python -m storyteller.main test${NC}"
     echo
     if [[ $(detect_pi_model) == "pi_zero_2w" ]]; then
         echo -e "${YELLOW}Note: Pi Zero 2W detected. A reboot is recommended to apply audio configuration.${NC}"

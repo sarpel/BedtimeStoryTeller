@@ -1,18 +1,17 @@
 [Unit]
 Description=Bedtime Storyteller Service
 Documentation=https://github.com/your-repo/bedtime-storyteller
-After=network.target sound.service
+After=network.target
 Wants=network.target
-Requires=sound.service
 
 [Service]
 Type=simple
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/bedtime-storyteller
-Environment=PATH=/home/pi/bedtime-storyteller/venv/bin:/usr/local/bin:/usr/bin:/bin
-Environment=PYTHONPATH=/home/pi/bedtime-storyteller
-ExecStart=/home/pi/bedtime-storyteller/venv/bin/python -m storyteller.main run --daemon
+WorkingDirectory=/home/pi/BedtimeStoryTeller
+Environment=PATH=/home/pi/BedtimeStoryTeller/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/home/pi/BedtimeStoryTeller
+ExecStart=/home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main run --daemon
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStop=/bin/kill -TERM $MAINPID
 KillMode=mixed
@@ -20,7 +19,7 @@ TimeoutStopSec=30
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/home/pi/bedtime-storyteller
+ReadWritePaths=/home/pi/BedtimeStoryTeller
 ReadWritePaths=/var/log
 ReadWritePaths=/tmp
 NoNewPrivileges=true

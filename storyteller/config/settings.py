@@ -5,7 +5,8 @@ Follows resource-first development principles with validation.
 
 import os
 from typing import Optional, Literal
-from pydantic import BaseSettings, Field, validator
+from pydantic import BaseModel, Field, field_validator
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -104,7 +105,8 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         case_sensitive = False
     
-    @validator("max_memory_mb")
+    @field_validator("max_memory_mb")
+    @classmethod
     def validate_memory_constraint(cls, v):
         """Ensure memory constraint is reasonable for Pi Zero 2W."""
         if v > 450:  # Pi Zero 2W has 512MB total
@@ -113,38 +115,8 @@ class Settings(BaseSettings):
             raise ValueError("Memory limit too low for application")
         return v
     
-    @validator("porcupine_access_key")
-    def validate_porcupine_key_if_needed(cls, v, values):
-        """Validate Porcupine access key if Porcupine is selected."""
-        if values.get("wakeword_engine") == "porcupine" and not v:
-            raise ValueError("Porcupine access key required when using Porcupine engine")
-        return v
-    
-    @validator("openai_api_key")
-    def validate_openai_key_if_needed(cls, v, values):
-        """Validate OpenAI API key if OpenAI is the default provider."""
-        llm_provider = values.get("default_llm_provider")
-        tts_provider = values.get("default_tts_provider")
-        
-        if (llm_provider == "openai" or tts_provider == "openai") and not v:
-            raise ValueError("OpenAI API key required when using OpenAI services")
-        return v
-    
-    @validator("gemini_api_key")
-    def validate_gemini_key_if_needed(cls, v, values):
-        """Validate Gemini API key if Gemini is the default LLM provider."""
-        if values.get("default_llm_provider") == "gemini" and not v:
-            raise ValueError("Gemini API key required when using Gemini as LLM provider")
-        return v
-    
-    @validator("elevenlabs_api_key")
-    def validate_elevenlabs_key_if_needed(cls, v, values):
-        """Validate ElevenLabs API key if ElevenLabs is the default TTS provider."""
-        if values.get("default_tts_provider") == "elevenlabs" and not v:
-            raise ValueError("ElevenLabs API key required when using ElevenLabs TTS")
-        return v
-    
-    @validator("story_language")
+    @field_validator("story_language")
+    @classmethod
     def validate_story_language(cls, v):
         """Ensure story language is supported."""
         supported_languages = ["tr", "en"]  # Turkish and English

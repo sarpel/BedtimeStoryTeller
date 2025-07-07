@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="bedtime-storyteller"
+PROJECT_NAME="BedtimeStoryTeller"
 SERVICE_NAME="storyteller"
 DEFAULT_USER="pi"
 DEFAULT_HOME="/home/${DEFAULT_USER}"
@@ -176,7 +176,7 @@ update_service_file() {
             cp "$INSTALL_DIR/scripts/storyteller.service" "/etc/systemd/system/"
             
             # Update paths in service file
-            sed -i "s|/home/pi/bedtime-storyteller|$INSTALL_DIR|g" "/etc/systemd/system/storyteller.service"
+            sed -i "s|/home/pi/BedtimeStoryTeller|$INSTALL_DIR|g" "/etc/systemd/system/storyteller.service"
             sed -i "s|User=pi|User=$DEFAULT_USER|g" "/etc/systemd/system/storyteller.service"
             sed -i "s|Group=pi|Group=$DEFAULT_USER|g" "/etc/systemd/system/storyteller.service"
             

@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="bedtime-storyteller"
+PROJECT_NAME="BedtimeStoryTeller"
 SERVICE_NAME="storyteller"
 DEFAULT_USER="pi"
 DEFAULT_HOME="/home/${DEFAULT_USER}"

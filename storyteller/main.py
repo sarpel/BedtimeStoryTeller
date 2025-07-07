@@ -448,8 +448,11 @@ def run(daemon: bool, config: Optional[str]) -> None:
             logger.info("Daemon mode not fully implemented, running in foreground")
         
         # Run the application
-        asyncio.run(app.initialize())
-        asyncio.run(app.run())
+        async def run_app():
+            await app.initialize()
+            await app.run()
+        
+        asyncio.run(run_app())
         
     except KeyboardInterrupt:
         logger.info("Interrupted by user")
