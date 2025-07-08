@@ -28,8 +28,8 @@ logger = logging.getLogger(__name__)
 class StoryRequest(BaseModel):
     """Request model for story generation."""
     prompt: str = Field(..., min_length=1, max_length=500)
-    language: str = Field(default="tr", regex="^(tr|en)$")
-    age_rating: str = Field(default="5+", regex="^[0-9]+\\+$")
+    language: str = Field(default="tr", pattern="^(tr|en)$")
+    age_rating: str = Field(default="5+", pattern="^[0-9]+\\+$")
     
 class StoryResponse(BaseModel):
     """Response model for story generation."""
