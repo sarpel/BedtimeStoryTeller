@@ -81,19 +81,25 @@ class IQAudioDevice(AudioInterface):
         """Check if IQAudio device is available."""
         try:
             device_count = self.audio.get_device_count()
+            logger.info(f"Found {device_count} audio devices.")
             for i in range(device_count):
                 device_info = self.audio.get_device_info_by_index(i)
                 device_name = device_info["name"].lower()
+                logger.debug(f"Device {i}: {device_name}")
                 
                 if "iqaudio" in device_name or "codec" in device_name:
-                    logger.info(f"Found IQAudio device: {device_info['name']}")
+                    logger.info(f"Found IQAudio device by name: {device_info['name']}")
                     return True
             
             # Check via aplay/arecord
+            logger.debug("Checking with aplay -l")
             result = subprocess.run(["aplay", "-l"], capture_output=True, text=True)
-            if "iqaudio" in result.stdout.lower() or "codec" in result.stdout.lower():
+            output = result.stdout.lower()
+            if "iqaudio" in output or "codec" in output:
+                logger.info("Found IQAudio device via aplay")
                 return True
             
+            logger.warning("IQAudio Codec device not found.")
             return False
             
         except Exception as e:
@@ -416,23 +422,28 @@ class USBAudioDevice(AudioInterface):
         """Find USB audio device."""
         try:
             device_count = self.audio.get_device_count()
+            logger.info(f"Found {device_count} audio devices.")
+            
             for i in range(device_count):
                 device_info = self.audio.get_device_info_by_index(i)
                 device_name = device_info["name"].lower()
-                
+                logger.debug(f"Device {i}: {device_name}, inputs: {device_info['maxInputChannels']}, outputs: {device_info['maxOutputChannels']}")
+
                 # Look for USB audio indicators
-                if any(keyword in device_name for keyword in ["usb", "waveshare", "audio"]):
+                if any(keyword in device_name for keyword in ["usb", "waveshare", "audio", "microphone"]):
                     if device_info["maxInputChannels"] > 0 and device_info["maxOutputChannels"] > 0:
-                        logger.info(f"Found USB audio device: {device_info['name']}")
+                        logger.info(f"Found USB audio device: {device_info['name']} at index {i}")
                         return i
             
-            # Fallback: look for any device that's not the default
-            for i in range(1, device_count):  # Skip device 0 (usually built-in)
+            # Fallback: look for any device that's not the default and has both input and output
+            for i in range(device_count):
                 device_info = self.audio.get_device_info_by_index(i)
-                if device_info["maxInputChannels"] > 0 and device_info["maxOutputChannels"] > 0:
-                    logger.info(f"Using fallback USB device: {device_info['name']}")
+                is_default = device_info.get('is_default', False)
+                if not is_default and device_info["maxInputChannels"] > 0 and device_info["maxOutputChannels"] > 0:
+                    logger.info(f"Using fallback USB device: {device_info['name']} at index {i}")
                     return i
             
+            logger.warning("No suitable USB audio device found.")
             return None
             
         except Exception as e:

@@ -190,7 +190,8 @@ class StorytellingAgent:
                 self.on_story_started(session)
             
             # Start story generation and playback pipeline
-            await self._execute_story_pipeline(session)
+            self.generation_task = asyncio.create_task(self._execute_story_pipeline(session))
+            await self.generation_task
             
             # Update stats
             self.stats["sessions_completed"] += 1
@@ -282,10 +283,10 @@ class StorytellingAgent:
                         (current_avg * sessions + time_to_first_sound) / (sessions + 1)
                     )
                 
-                # Limit concurrent TTS requests to manage memory
                 if len(tts_tasks) >= self.settings.max_concurrent_tts_requests:
-                    await asyncio.gather(*tts_tasks[:1])  # Wait for oldest task
-                    tts_tasks = tts_tasks[1:]
+                    # Wait for the oldest task to complete
+                    await tts_tasks[0]
+                    tts_tasks.pop(0)
             
             # Wait for all TTS tasks to complete
             if tts_tasks:
