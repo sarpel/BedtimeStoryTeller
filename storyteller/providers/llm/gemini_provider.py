@@ -201,15 +201,35 @@ class GeminiLLMProvider(BaseLLMProvider):
                 self.set_status(ProviderStatus.ERROR, error)
             raise error
             
+        except httpx.RequestError as e:
+            error = ProviderError(
+                provider_name=self.name,
+                error_type="network_error",
+                message=f"Gemini API request failed: {e.__class__.__name__}",
+                is_recoverable=True
+            )
+            self.set_status(ProviderStatus.ERROR, error)
+            raise error from e
+
+        except json.JSONDecodeError as e:
+            error = ProviderError(
+                provider_name=self.name,
+                error_type="invalid_response",
+                message=f"Failed to decode Gemini API response: {e}",
+                is_recoverable=True
+            )
+            self.set_status(ProviderStatus.ERROR, error)
+            raise error from e
+
         except Exception as e:
             error = ProviderError(
                 provider_name=self.name,
                 error_type="unknown",
-                message=f"Unexpected error: {str(e)}",
+                message=f"An unexpected error occurred in Gemini provider: {str(e)}",
                 is_recoverable=False
             )
             self.set_status(ProviderStatus.ERROR, error)
-            raise error
+            raise error from e
     
     def _is_paragraph_complete(self, text: str) -> bool:
         """

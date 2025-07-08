@@ -43,7 +43,7 @@ class TTSRequest:
 
 
 @dataclass
-class ProviderError:
+class ProviderError(Exception):
     """Provider error information."""
     provider_name: str
     error_type: str

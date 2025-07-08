@@ -1,189 +1,212 @@
-[SUCCESS] Initial tests completed
-[SUCCESS] Installation completed successfully!
+(venv) pi@DietPi:~/BedtimeStoryTeller$ pip install websockets wsproto
+Requirement already satisfied: websockets in ./venv/lib/python3.11/site-packages (15.0.1)
+Collecting wsproto
+  Downloading wsproto-1.2.0-py3-none-any.whl.metadata (5.6 kB)
+Requirement already satisfied: h11<1,>=0.9.0 in ./venv/lib/python3.11/site-packages (from wsproto) (0.16.0)
+Downloading wsproto-1.2.0-py3-none-any.whl (24 kB)
+Installing collected packages: wsproto
+Successfully installed wsproto-1.2.0
+(venv) pi@DietPi:~/BedtimeStoryTeller$ sudo systemctl restart storyteller
+(venv) pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
+Jul 08 21:57:05 DietPi storyteller[3773]: 2025-07-08 21:57:05,803 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 21:57:05 DietPi storyteller[3773]: 2025-07-08 21:57:05,804 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 21:57:06 DietPi storyteller[3773]: 2025-07-08 21:57:06,490 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 21:57:06 DietPi storyteller[3773]: 2025-07-08 21:57:06,491 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 21:57:11 DietPi storyteller[3773]: INFO:     192.168.1.155:62197 - "WebSocket /ws" [accepted]
+Jul 08 21:57:11 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 21:57:19 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 21:57:19 DietPi storyteller[3773]: 2025-07-08 21:57:19,490 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 21:57:19 DietPi storyteller[3773]: INFO:     192.168.1.155:62203 - "WebSocket /ws" [accepted]
+Jul 08 21:57:19 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,091 - storyteller.core.agent - INFO - Wake word detected: manual_trigger (confidence: 1.000)
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,092 - storyteller.core.agent - INFO - Starting story session: session_1752012147
+Jul 08 22:02:27 DietPi storyteller[3773]: /home/pi/BedtimeStoryTeller/storyteller/core/agent.py:190: RuntimeWarning: coroutine 'WebApplication.initialize.<locals>.on_story_started' was never awaited
+Jul 08 22:02:27 DietPi storyteller[3773]:   self.on_story_started(session)
+Jul 08 22:02:27 DietPi storyteller[3773]: RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,092 - storyteller.core.agent - INFO - Agent state changed: error -> generating
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,093 - storyteller.utils.safety_filter - INFO - Prompt safety check completed: 0 violations filtered
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,349 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:02:27 DietPi storyteller[3773]: 2025-07-08 22:02:27,350 - storyteller.providers.base - WARNING - LLM provider gemini unavailable: ProviderStatus.ERROR
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,384 - httpx - INFO - HTTP Request: GET https://api.openai.com/v1/models "HTTP/1.1 200 OK"
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,385 - storyteller.providers.base - INFO - Using LLM provider: openai
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,863 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,865 - storyteller.providers.base - INFO - Using TTS provider: elevenlabs
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,865 - storyteller.core.agent - INFO - Using LLM: openai, TTS: elevenlabs
+Jul 08 22:02:30 DietPi storyteller[3773]: 2025-07-08 22:02:30,927 - storyteller.core.agent - INFO - Agent state changed: generating -> playing
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,066 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 403 Forbidden"
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,067 - storyteller.providers.base - WARNING - Provider openai error: Unexpected error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,067 - storyteller.core.agent - ERROR - Story pipeline error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - storyteller.core.agent - ERROR - Story generation failed: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - storyteller.core.agent - INFO - Agent state changed: playing -> error
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - __main__ - ERROR - Agent error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - storyteller.core.agent - ERROR - Wake word story handling failed: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - __main__ - ERROR - Agent error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: /home/pi/BedtimeStoryTeller/storyteller/storage/story_library.py:517: SAWarning: Usage of the 'Session.add()' operation is not currently supported within the execution stage of the flush process. Results may not be consistent.  Consider using alternative event listeners or connection-level operations instead.
+Jul 08 22:02:32 DietPi storyteller[3773]:   self.session.add(event)
+Jul 08 22:02:45 DietPi storyteller[3773]: 2025-07-08 22:02:45,243 - storyteller.web.app - ERROR - Story creation failed: 409: Agent is busy
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     192.168.1.155:62785 - "WebSocket /ws" [accepted]
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:17 DietPi storyteller[3773]: 2025-07-08 22:03:17,481 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:22 DietPi storyteller[3773]: 2025-07-08 22:03:22,156 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     192.168.1.155:62786 - "WebSocket /ws" [accepted]
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:03:31 DietPi storyteller[3773]: 2025-07-08 22:03:31,921 - storyteller.web.app - ERROR - Story creation failed: 409: Agent is busy
+Jul 08 22:03:59 DietPi storyteller[3773]: 2025-07-08 22:03:59,029 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:03:59 DietPi storyteller[3773]: 2025-07-08 22:03:59,033 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     192.168.1.155:62806 - "WebSocket /ws" [accepted]
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:17 DietPi storyteller[3773]: 2025-07-08 22:04:17,078 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:04:17 DietPi storyteller[3773]: 2025-07-08 22:04:17,078 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     192.168.1.155:62817 - "WebSocket /ws" [accepted]
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:20 DietPi storyteller[3773]: 2025-07-08 22:04:20,581 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     192.168.1.155:62821 - "WebSocket /ws" [accepted]
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     192.168.1.155:62823 - "WebSocket /ws" [accepted]
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:22 DietPi storyteller[3773]: 2025-07-08 22:04:22,565 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:04:23 DietPi storyteller[3773]: 2025-07-08 22:04:23,640 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     192.168.1.155:62824 - "WebSocket /ws" [accepted]
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     192.168.1.155:62825 - "WebSocket /ws" [accepted]
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:24 DietPi storyteller[3773]: 2025-07-08 22:04:24,691 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+rive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - storyteller.core.agent - INFO - Agent state changed: playing -> error
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - __main__ - ERROR - Agent error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - storyteller.core.agent - ERROR - Wake word story handling failed: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: 2025-07-08 22:02:32,068 - __main__ - ERROR - Agent error: exceptions must derive from BaseException
+Jul 08 22:02:32 DietPi storyteller[3773]: /home/pi/BedtimeStoryTeller/storyteller/storage/story_library.py:517: SAWarning: Usage of the 'Session.add()' operation is not currently supported within the execution stage of the flush process. Results may not be consistent.  Consider using alternative event listeners or connection-level operations instead.
+Jul 08 22:02:32 DietPi storyteller[3773]:   self.session.add(event)
+Jul 08 22:02:45 DietPi storyteller[3773]: 2025-07-08 22:02:45,243 - storyteller.web.app - ERROR - Story creation failed: 409: Agent is busy
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     192.168.1.155:62785 - "WebSocket /ws" [accepted]
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:03:17 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:17 DietPi storyteller[3773]: 2025-07-08 22:03:17,481 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:22 DietPi storyteller[3773]: 2025-07-08 22:03:22,156 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     192.168.1.155:62786 - "WebSocket /ws" [accepted]
+Jul 08 22:03:22 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:03:31 DietPi storyteller[3773]: 2025-07-08 22:03:31,921 - storyteller.web.app - ERROR - Story creation failed: 409: Agent is busy
+Jul 08 22:03:59 DietPi storyteller[3773]: 2025-07-08 22:03:59,029 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:03:59 DietPi storyteller[3773]: 2025-07-08 22:03:59,033 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     192.168.1.155:62806 - "WebSocket /ws" [accepted]
+Jul 08 22:03:59 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:17 DietPi storyteller[3773]: 2025-07-08 22:04:17,078 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:04:17 DietPi storyteller[3773]: 2025-07-08 22:04:17,078 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     192.168.1.155:62817 - "WebSocket /ws" [accepted]
+Jul 08 22:04:17 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:20 DietPi storyteller[3773]: 2025-07-08 22:04:20,581 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     192.168.1.155:62821 - "WebSocket /ws" [accepted]
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:20 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     192.168.1.155:62823 - "WebSocket /ws" [accepted]
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:22 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:22 DietPi storyteller[3773]: 2025-07-08 22:04:22,565 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:04:23 DietPi storyteller[3773]: 2025-07-08 22:04:23,640 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     192.168.1.155:62824 - "WebSocket /ws" [accepted]
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:23 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     192.168.1.155:62825 - "WebSocket /ws" [accepted]
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:04:24 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:04:24 DietPi storyteller[3773]: 2025-07-08 22:04:24,691 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:05:04 DietPi storyteller[3773]: 2025-07-08 22:05:04,625 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:05:04 DietPi storyteller[3773]: INFO:     192.168.1.155:62842 - "WebSocket /ws" [accepted]
+Jul 08 22:05:04 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:04 DietPi storyteller[3773]: 2025-07-08 22:05:04,627 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:05:04 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:07 DietPi storyteller[3773]: INFO:     192.168.1.155:62845 - "WebSocket /ws" [accepted]
+Jul 08 22:05:07 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:07 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:07 DietPi storyteller[3773]: 2025-07-08 22:05:07,998 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:05:25 DietPi storyteller[3773]: 2025-07-08 22:05:25,623 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
+Jul 08 22:05:25 DietPi storyteller[3773]: INFO:     192.168.1.155:62860 - "WebSocket /ws" [accepted]
+Jul 08 22:05:25 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:25 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:25 DietPi storyteller[3773]: 2025-07-08 22:05:25,627 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:05:29 DietPi storyteller[3773]: 2025-07-08 22:05:29,712 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:05:29 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:29 DietPi storyteller[3773]: INFO:     192.168.1.155:62868 - "WebSocket /ws" [accepted]
+Jul 08 22:05:29 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:31 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:32 DietPi storyteller[3773]: 2025-07-08 22:05:32,001 - storyteller.web.app - ERROR - Story listing failed: StoryLibrary.get_recent_sessions() got an unexpected keyword argument 'offset'
+Jul 08 22:05:32 DietPi storyteller[3773]: INFO:     192.168.1.155:62869 - "WebSocket /ws" [accepted]
+Jul 08 22:05:32 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:33 DietPi storyteller[3773]: INFO:     192.168.1.155:62870 - "WebSocket /ws" [accepted]
+Jul 08 22:05:33 DietPi storyteller[3773]: INFO:     connection open
+Jul 08 22:05:33 DietPi storyteller[3773]: INFO:     connection closed
+Jul 08 22:05:33 DietPi storyteller[3773]: 2025-07-08 22:05:33,509 - storyteller.web.app - ERROR - Status check failed: 'HardwareManager' object has no attribute 'get_status'
 
-Next Steps:
-1. Edit the configuration file:
-   sudo nano /home/pi/BedtimeStoryTeller/.env
-
-2. Add your API keys:
-   - OPENAI_API_KEY (required)
-   - PORCUPINE_ACCESS_KEY (required for wake word)
-
-3. Start the service:
-   sudo systemctl start storyteller
-
-4. Check service status:
-   sudo systemctl status storyteller
-
-5. View logs:
-   sudo journalctl -u storyteller -f
-
-6. Access web interface:
-   http://192.168.1.48/
-
-7. Test the system:
-   sudo -u pi /home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main test
-
-pi@DietPi:~/BedtimeStoryTeller$ sudo systemctl start storyteller
-pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
-Jul 08 21:40:54 DietPi storyteller[3639]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:40:54 DietPi storyteller[3639]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:40:54 DietPi storyteller[3639]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:40:54 DietPi storyteller[3639]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:40:54 DietPi storyteller[3639]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:40:54 DietPi storyteller[3639]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:40:54 DietPi storyteller[3639]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Consumed 1.380s CPU time.
-Jul 08 21:41:05 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 1.
-Jul 08 21:41:05 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:41:05 DietPi systemd[1]: storyteller.service: Consumed 1.380s CPU time.
-Jul 08 21:41:05 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:41:06 DietPi storyteller[3646]: Traceback (most recent call last):
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "<frozen runpy>", line 198, in _run_module_as_main
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "<frozen runpy>", line 88, in _run_code
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
-Jul 08 21:41:06 DietPi storyteller[3646]:     from .web.app import create_app
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
-Jul 08 21:41:06 DietPi storyteller[3646]:     web_app = WebApplication()
-Jul 08 21:41:06 DietPi storyteller[3646]:               ^^^^^^^^^^^^^^^^
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:41:06 DietPi storyteller[3646]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:41:06 DietPi storyteller[3646]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:41:06 DietPi storyteller[3646]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:41:06 DietPi storyteller[3646]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:41:06 DietPi storyteller[3646]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Consumed 1.484s CPU time.
-Jul 08 21:41:16 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 2.
-Jul 08 21:41:16 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:41:16 DietPi systemd[1]: storyteller.service: Consumed 1.484s CPU time.
-Jul 08 21:41:16 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:41:17 DietPi storyteller[3650]: Traceback (most recent call last):
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "<frozen runpy>", line 198, in _run_module_as_main
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "<frozen runpy>", line 88, in _run_code
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
-Jul 08 21:41:17 DietPi storyteller[3650]:     from .web.app import create_app
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
-Jul 08 21:41:17 DietPi storyteller[3650]:     web_app = WebApplication()
-Jul 08 21:41:17 DietPi storyteller[3650]:               ^^^^^^^^^^^^^^^^
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:41:17 DietPi storyteller[3650]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:41:17 DietPi storyteller[3650]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:41:17 DietPi storyteller[3650]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:41:17 DietPi storyteller[3650]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:41:17 DietPi storyteller[3650]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Consumed 1.197s CPU time.
-Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 3.
-Jul 08 21:41:27 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Consumed 1.197s CPU time.
-Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Start request repeated too quickly.
-Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:41:27 DietPi systemd[1]: Failed to start storyteller.service - Bedtime Storyteller Service.
-^C
-pi@DietPi:~/BedtimeStoryTeller$ git pull
-Already up to date.
-pi@DietPi:~/BedtimeStoryTeller$ git pull
-remote: Enumerating objects: 13, done.
-remote: Counting objects: 100% (13/13), done.
-remote: Compressing objects: 100% (6/6), done.
-remote: Total 10 (delta 4), reused 10 (delta 4), pack-reused 0 (from 0)
-Unpacking objects: 100% (10/10), 10.35 KiB | 3.45 MiB/s, done.
-From https://github.com/sarpel/BedtimeStoryTeller
-   b6517a0..f142caa  main       -> origin/main
-Updating b6517a0..f142caa
-Fast-forward
- CLAUDE.md                  | Bin 0 -> 7420 bytes
- demonstrate_fix.py         | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- pyproject.toml             |   1 +
- quick_fix_main.py          | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- requirements.txt           |   1 +
- test_audio_fix.py          | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- test_core_functionality.py | 203 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- test_simple.py             | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 8 files changed, 707 insertions(+)
- create mode 100644 CLAUDE.md
- create mode 100644 demonstrate_fix.py
- create mode 100644 quick_fix_main.py
- create mode 100644 test_audio_fix.py
- create mode 100644 test_core_functionality.py
- create mode 100644 test_simple.py
-pi@DietPi:~/BedtimeStoryTeller$ sudo systemctl restart storyteller
-pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
-Jul 08 21:48:03 DietPi storyteller[3683]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:48:03 DietPi storyteller[3683]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:48:03 DietPi storyteller[3683]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:03 DietPi storyteller[3683]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:48:03 DietPi storyteller[3683]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:48:03 DietPi storyteller[3683]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:03 DietPi storyteller[3683]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Consumed 1.434s CPU time.
-Jul 08 21:48:14 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 1.
-Jul 08 21:48:14 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:48:14 DietPi systemd[1]: storyteller.service: Consumed 1.434s CPU time.
-Jul 08 21:48:14 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:48:15 DietPi storyteller[3690]: Traceback (most recent call last):
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "<frozen runpy>", line 198, in _run_module_as_main
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "<frozen runpy>", line 88, in _run_code
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
-Jul 08 21:48:15 DietPi storyteller[3690]:     from .web.app import create_app
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
-Jul 08 21:48:15 DietPi storyteller[3690]:     web_app = WebApplication()
-Jul 08 21:48:15 DietPi storyteller[3690]:               ^^^^^^^^^^^^^^^^
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:48:15 DietPi storyteller[3690]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:48:15 DietPi storyteller[3690]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:48:15 DietPi storyteller[3690]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:48:15 DietPi storyteller[3690]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:15 DietPi storyteller[3690]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Consumed 1.505s CPU time.
-Jul 08 21:48:25 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 2.
-Jul 08 21:48:25 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:48:25 DietPi systemd[1]: storyteller.service: Consumed 1.505s CPU time.
-Jul 08 21:48:25 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
-Jul 08 21:48:26 DietPi storyteller[3694]: Traceback (most recent call last):
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "<frozen runpy>", line 198, in _run_module_as_main
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "<frozen runpy>", line 88, in _run_code
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
-Jul 08 21:48:26 DietPi storyteller[3694]:     from .web.app import create_app
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
-Jul 08 21:48:26 DietPi storyteller[3694]:     web_app = WebApplication()
-Jul 08 21:48:26 DietPi storyteller[3694]:               ^^^^^^^^^^^^^^^^
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-Jul 08 21:48:26 DietPi storyteller[3694]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
-Jul 08 21:48:26 DietPi storyteller[3694]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-Jul 08 21:48:26 DietPi storyteller[3694]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-Jul 08 21:48:26 DietPi storyteller[3694]:            ^^^^^^^^^^^^^^^^^^
-Jul 08 21:48:26 DietPi storyteller[3694]: AssertionError: jinja2 must be installed to use Jinja2Templates
-Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
-Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
-Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Consumed 1.179s CPU time.
-^C
-pi@DietPi:~/BedtimeStoryTeller$ sudo -u pi /home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main test
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
-    from .web.app import create_app
-  File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
-    web_app = WebApplication()
-              ^^^^^^^^^^^^^^^^
-  File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
-    self.templates = Jinja2Templates(directory="storyteller/web/templates")
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
-    assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
-           ^^^^^^^^^^^^^^^^^^
-AssertionError: jinja2 must be installed to use Jinja2Templates
+(venv) pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
+Jul 08 22:07:31 DietPi storyteller[3829]: 2025-07-08 22:07:31,147 - __main__ - ERROR - Agent error: No engine loaded. Call load_engine() first.
+Jul 08 22:07:31 DietPi storyteller[3829]: 2025-07-08 22:07:31,147 - __main__ - WARNING - Failed to start wake word listening: No engine loaded. Call load_engine() first.
+Jul 08 22:07:31 DietPi storyteller[3829]: 2025-07-08 22:07:31,147 - __main__ - INFO - Service running without wake word detection - use button or web interface
+Jul 08 22:07:31 DietPi storyteller[3829]: 2025-07-08 22:07:31,147 - __main__ - INFO - Bedtime Storyteller is running. Press Ctrl+C to stop.
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     Started server process [3829]
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     Waiting for application startup.
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     Application startup complete.
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     192.168.1.155:62927 - "WebSocket /ws" [accepted]
+Jul 08 22:07:31 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:07:35 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:07:35 DietPi storyteller[3829]: INFO:     192.168.1.155:62933 - "WebSocket /ws" [accepted]
+Jul 08 22:07:35 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:07:35 DietPi storyteller[3829]: 2025-07-08 22:07:35,814 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:07:36 DietPi storyteller[3829]: 2025-07-08 22:07:36,297 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:07:58 DietPi storyteller[3829]: INFO:     192.168.1.155:62942 - "WebSocket /ws" [accepted]
+Jul 08 22:07:58 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:07:58 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:07:58 DietPi storyteller[3829]: 2025-07-08 22:07:58,942 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:07:59 DietPi storyteller[3829]: 2025-07-08 22:07:59,357 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:08:01 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:08:01 DietPi storyteller[3829]: INFO:     192.168.1.155:62943 - "WebSocket /ws" [accepted]
+Jul 08 22:08:01 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:08:02 DietPi storyteller[3829]: 2025-07-08 22:08:02,121 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:08:02 DietPi storyteller[3829]: 2025-07-08 22:08:02,513 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:08:03 DietPi storyteller[3829]: INFO:     192.168.1.155:62951 - "WebSocket /ws" [accepted]
+Jul 08 22:08:03 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:08:03 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:08:03 DietPi storyteller[3829]: 2025-07-08 22:08:03,877 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:08:04 DietPi storyteller[3829]: 2025-07-08 22:08:04,264 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:09:47 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:09:47 DietPi storyteller[3829]: INFO:     192.168.1.155:63122 - "WebSocket /ws" [accepted]
+Jul 08 22:09:47 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:09:48 DietPi storyteller[3829]: 2025-07-08 22:09:48,290 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:09:48 DietPi storyteller[3829]: 2025-07-08 22:09:48,721 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:09:52 DietPi storyteller[3829]: INFO:     192.168.1.155:63129 - "WebSocket /ws" [accepted]
+Jul 08 22:09:52 DietPi storyteller[3829]: INFO:     connection closed
+Jul 08 22:09:52 DietPi storyteller[3829]: INFO:     connection open
+Jul 08 22:09:52 DietPi storyteller[3829]: 2025-07-08 22:09:52,777 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,144 - httpx - INFO - HTTP Request: GET https://api.elevenlabs.io/v1/user "HTTP/1.1 200 OK"
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,458 - storyteller.core.agent - INFO - Wake word detected: manual_trigger (confidence: 1.000)
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,458 - storyteller.core.agent - INFO - Starting story session: session_1752012593
+Jul 08 22:09:53 DietPi storyteller[3829]: /home/pi/BedtimeStoryTeller/storyteller/core/agent.py:190: RuntimeWarning: coroutine 'WebApplication.initialize.<locals>.on_story_started' was never awaited
+Jul 08 22:09:53 DietPi storyteller[3829]:   self.on_story_started(session)
+Jul 08 22:09:53 DietPi storyteller[3829]: RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,459 - storyteller.core.agent - INFO - Agent state changed: error -> generating
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,460 - storyteller.utils.safety_filter - INFO - Prompt safety check completed: 0 violations filtered
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,880 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=APIAIzaSyDCnI6rlJbgdiS0eB6npXY1wYdlxxY9rUM "HTTP/1.1 400 Bad Request"
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,881 - storyteller.providers.base - WARNING - LLM provider gemini unavailable: ProviderStatus.ERROR
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - storyteller.providers.base - ERROR - No available LLM providers
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - storyteller.core.agent - ERROR - Story pipeline error: No LLM provider available
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - storyteller.core.agent - ERROR - Story generation failed: No LLM provider available
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - storyteller.core.agent - INFO - Agent state changed: generating -> error
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - __main__ - ERROR - Agent error: No LLM provider available
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - storyteller.core.agent - ERROR - Wake word story handling failed: No LLM provider available
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,882 - __main__ - ERROR - Agent error: No LLM provider available
+Jul 08 22:09:53 DietPi storyteller[3829]: /home/pi/BedtimeStoryTeller/storyteller/storage/story_library.py:518: SAWarning: Usage of the 'Session.add()' operation is not currently supported within the execution stage of the flush process. Results may not be consistent.  Consider using alternative event listeners or connection-level operations instead.
+Jul 08 22:09:53 DietPi storyteller[3829]:   self.session.add(event)
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,884 - storyteller.storage.story_library - ERROR - Failed to log event: Method 'commit()' can't be called here; method '_prepare_impl()' is already in progress and this would cause an unexpected state change to <SessionTransactionState.CLOSED: 5> (Background on this error at: https://sqlalche.me/e/20/isce)
+Jul 08 22:09:53 DietPi storyteller[3829]: 2025-07-08 22:09:53,885 - storyteller.storage.story_library - ERROR - Failed to log event: This transaction is closed

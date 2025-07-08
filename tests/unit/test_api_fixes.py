@@ -22,7 +22,7 @@ def web_app_fixture():
     app.agent.hardware_manager = AsyncMock(spec=HardwareManager)
     app.agent.hardware_manager.get_hardware_info.return_value = {"status": "ok"}
     app.agent.get_status.return_value = {"state": "idle", "is_running": True}
-    app.agent.provider_manager.health_check.return_value = {"llm": "ok", "tts": "ok"}
+    app.agent.provider_manager.health_check = AsyncMock(return_value={"llm": "ok", "tts": "ok"})
 
     # Mock the story library
     app.story_library = AsyncMock(spec=StoryLibrary)

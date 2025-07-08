@@ -187,7 +187,7 @@ class StorytellingAgent:
             
             # Notify listeners
             if self.on_story_started:
-                self.on_story_started(session)
+                await self.on_story_started(session)
             
             # Start story generation and playback pipeline
             self.generation_task = asyncio.create_task(self._execute_story_pipeline(session))
@@ -204,7 +204,7 @@ class StorytellingAgent:
             
             # Notify listeners
             if self.on_story_completed:
-                self.on_story_completed(session)
+                await self.on_story_completed(session)
             
             return session
             

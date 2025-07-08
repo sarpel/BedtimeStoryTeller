@@ -502,11 +502,6 @@ class StoryLibrary:
     ) -> None:
         """Log a system event."""
         try:
-            # Skip logging if session is in flush process to avoid concurrent operation warnings
-            if hasattr(self.session, '_flushing') and self.session._flushing:
-                logger.debug(f"Skipping event logging during session flush: {event_type}")
-                return
-                
             event = SystemEvent(
                 event_type=event_type,
                 message=message,
@@ -516,13 +511,23 @@ class StoryLibrary:
                 metadata=metadata or {}
             )
             self.session.add(event)
-            await self.session.commit()
-            
+
+            # Commit only if the session is not already in a transaction
+            if not self.session.in_transaction():
+                await self.session.commit()
+            else:
+                # If in a transaction, the caller is responsible for the commit.
+                # We can flush to make the event available in the current transaction.
+                await self.session.flush()
+
         except Exception as e:
-            # Only log non-session errors to avoid spam
-            if "concurrent operations are not permitted" not in str(e):
-                logger.error(f"Failed to log event: {e}")
-            # Don't rollback for logging failures
+            logger.error(f"Failed to log event: {e}")
+            # Avoid rollback if the error is due to nested transactions,
+            # as it could disrupt the parent transaction.
+            if "can't be called here" not in str(e) and "closed" not in str(e):
+                await self.session.rollback()
+            # Re-raise the exception to notify the caller of the logging failure
+            raise
     
     async def get_recent_events(self, limit: int = 100, level: Optional[str] = None) -> List[SystemEvent]:
         """Get recent system events."""

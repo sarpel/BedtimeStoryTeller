@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 # Base sınıflarını import ederek 'spec' özelliğini kullanabiliriz.
 # Bu, mock nesnelerin sadece orijinal sınıfta var olan metodları
 # taklit etmesini sağlar ve testlerin güvenilirliğini artırır.
-from agent.providers import BaseLLMProvider, BaseTTSProvider
+from storyteller.providers.base import BaseLLMProvider, BaseTTSProvider
 
 @pytest.fixture
 def mock_llm_provider() -> MagicMock:

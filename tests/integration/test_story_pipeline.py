@@ -6,8 +6,8 @@ import asyncio
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from storyteller.core.agent import StorytellingAgent, AgentState
-from storyteller.core.story_generator import StoryRequest, StorySession
+from storyteller.core.agent import StorytellingAgent, AgentState, StorySession
+from storyteller.providers.base import StoryRequest
 
 
 class TestStoryPipeline:
@@ -51,7 +51,8 @@ class TestStoryPipeline:
         mock_tts_provider.synthesize_speech.return_value = b'fake_audio_data'
         
         # Start story generation
-        session = await story_agent.tell_story(sample_story_request.prompt)
+        agent = await story_agent
+        session = await agent.tell_story(sample_story_request.prompt)
         
         # Wait for story to complete
         timeout = 5.0
@@ -82,17 +83,18 @@ class TestStoryPipeline:
         mock_llm_provider.generate_story_stream.return_value = mock_story_stream()
         
         # Start first story
-        session1 = await story_agent.tell_story("First story")
+        agent = await story_agent
+        session1 = await agent.tell_story("First story")
         
         # Try to start second story while first is running
         with pytest.raises(RuntimeError, match="Agent is busy"):
-            await story_agent.tell_story("Second story")
+            await agent.tell_story("Second story")
         
         # Wait for first story to complete
         await asyncio.sleep(1.0)
         
         # Now second story should work
-        session2 = await story_agent.tell_story("Second story")
+        session2 = await agent.tell_story("Second story")
         assert session2.session_id != session1.session_id
     
     @pytest.mark.asyncio
@@ -135,7 +137,8 @@ class TestStoryPipeline:
         mock_safety_filter.filter_content.side_effect = mock_filter_content
         
         # Generate story
-        session = await story_agent.tell_story("Tell me a story")
+        agent = await story_agent
+        session = await agent.tell_story("Tell me a story")
         
         # Wait for completion
         await asyncio.sleep(1.0)
@@ -157,11 +160,12 @@ class TestStoryPipeline:
         # Test LLM provider error
         mock_llm_provider.generate_story_stream.side_effect = network_error
         
+        agent = await story_agent
         with pytest.raises(Exception):
-            await story_agent.tell_story("Test story")
+            await agent.tell_story("Test story")
         
         # Verify agent returns to idle state after error
-        assert story_agent.state == AgentState.IDLE
+        assert agent.state == AgentState.IDLE
         
         # Test TTS provider error
         mock_llm_provider.generate_story_stream.side_effect = None
@@ -171,7 +175,7 @@ class TestStoryPipeline:
         
         mock_tts_provider.synthesize_speech.side_effect = network_error
         
-        session = await story_agent.tell_story("Test story")
+        session = await agent.tell_story("Test story")
         await asyncio.sleep(0.5)
         
         # Should handle TTS error gracefully
@@ -197,10 +201,11 @@ class TestStoryPipeline:
         def track_state_change(new_state):
             state_changes.append(new_state)
         
-        story_agent.on_state_change = track_state_change
+        agent = await story_agent
+        agent.on_state_change = track_state_change
         
         # Start story
-        session = await story_agent.tell_story("Test story")
+        session = await agent.tell_story("Test story")
         
         # Initial state should be active
         assert session.status == "active"
@@ -238,10 +243,11 @@ class TestStoryPipeline:
             audio_calls.append(text)
             return b'fake_audio_' + text.encode()
         
+        agent = await story_agent
         mock_tts_provider.synthesize_speech.side_effect = track_audio_synthesis
         
         # Start story generation
-        session = await story_agent.tell_story("Tell me about Oliver the owl")
+        session = await agent.tell_story("Tell me about Oliver the owl")
         
         # Wait for streaming to complete
         await asyncio.sleep(2.0)
@@ -270,10 +276,11 @@ class TestStoryPipeline:
         
         mock_llm_provider.generate_story_stream.return_value = mock_long_story()
         
+        agent = await story_agent
         performance_monitor.start()
         
         # Generate story
-        session = await story_agent.tell_story("Long story for memory test")
+        session = await agent.tell_story("Long story for memory test")
         
         # Wait for completion
         await asyncio.sleep(3.0)
@@ -318,10 +325,11 @@ class TestStoryPipeline:
         async def track_audio_playback(audio_data):
             playback_calls.append(audio_data)
         
+        agent = await story_agent
         mock_hardware_manager.audio.play_audio.side_effect = track_audio_playback
         
         # Start story
-        session = await story_agent.tell_story("Synchronization test")
+        session = await agent.tell_story("Synchronization test")
         
         # Wait for completion
         await asyncio.sleep(2.0)
@@ -347,17 +355,18 @@ class TestStoryPipeline:
         
         mock_llm_provider.generate_story_stream.return_value = mock_infinite_story()
         
+        agent = await story_agent
         # Start story
-        session = await story_agent.tell_story("Infinite story")
+        session = await agent.tell_story("Infinite story")
         
         # Let it run for a bit
         await asyncio.sleep(1.0)
         
         # Cancel the story
-        await story_agent.stop_current_story()
+        await agent.stop_current_story()
         
         # Verify agent returns to idle state
-        assert story_agent.state == AgentState.IDLE
+        assert agent.state == AgentState.IDLE
         
         # Verify session is marked as cancelled or stopped
         assert session.status in ["cancelled", "stopped", "failed"]

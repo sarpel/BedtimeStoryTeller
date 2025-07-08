@@ -70,6 +70,7 @@ class IQAudioDevice(AudioInterface):
             await self._configure_alsa()
             
             self.is_initialized = True
+            self.is_available = True
             logger.info("IQAudio Codec initialized successfully")
             
         except Exception as e:
@@ -411,6 +412,7 @@ class USBAudioDevice(AudioInterface):
                 raise RuntimeError("USB Audio device not found")
             
             self.is_initialized = True
+            self.is_available = True
             logger.info(f"USB Audio device initialized (device index: {device_index})")
             
         except Exception as e:
