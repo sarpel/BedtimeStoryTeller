@@ -36,15 +36,35 @@ from .utils.safety_filter import SafetyFilter
 from .storage.models import create_database_engine, create_tables, get_database_session, init_default_preferences
 from .storage.story_library import StoryLibrary
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler('/var/log/storyteller.log', mode='a') if os.path.exists('/var/log') else logging.NullHandler()
+# Setup logging with safe file handler
+def setup_logging():
+    """Setup logging with fallback handlers for permission issues."""
+    handlers = [logging.StreamHandler(sys.stdout)]
+    
+    # Try to add file handler, with fallbacks for permission issues
+    log_file_paths = [
+        '/var/log/storyteller.log',
+        '/tmp/storyteller.log',
+        os.path.expanduser('~/storyteller.log')
     ]
-)
+    
+    for log_path in log_file_paths:
+        try:
+            # Test if we can write to this location
+            test_path = os.path.dirname(log_path)
+            if os.path.exists(test_path) and os.access(test_path, os.W_OK):
+                handlers.append(logging.FileHandler(log_path, mode='a'))
+                break
+        except (PermissionError, OSError):
+            continue
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=handlers
+    )
+
+setup_logging()
 
 logger = logging.getLogger(__name__)
 
