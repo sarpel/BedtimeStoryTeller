@@ -48,11 +48,11 @@ class Settings(BaseSettings):
     
     # API settings - LLM providers
     openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")
-    openai_model: str = Field(default="gpt-3.5-turbo", env="OPENAI_MODEL")
+    openai_model: str = Field(default="gpt-4o-mini", env="OPENAI_MODEL")
     openai_base_url: Optional[str] = Field(default=None, env="OPENAI_BASE_URL")
     
     gemini_api_key: Optional[str] = Field(default=None, env="GEMINI_API_KEY")
-    gemini_model: str = Field(default="gemini-pro", env="GEMINI_MODEL")
+    gemini_model: str = Field(default="gemini-1.5-flash", env="GEMINI_MODEL")
     
     # API settings - TTS providers
     openai_tts_voice: str = Field(default="alloy", env="OPENAI_TTS_VOICE")

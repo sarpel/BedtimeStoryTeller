@@ -18,7 +18,9 @@ class OpenAILLMProvider(BaseLLMProvider):
     def __init__(self, api_key: str, model: str = "gpt-3.5-turbo", **kwargs):
         self.api_key = api_key
         self.model = model
-        self.base_url = kwargs.get("base_url", "https://api.openai.com/v1")
+        # Handle empty base_url properly
+        base_url = kwargs.get("base_url") or "https://api.openai.com/v1"
+        self.base_url = base_url.rstrip("/")  # Remove trailing slash
         self.timeout = kwargs.get("timeout", 30)
         self.max_retries = kwargs.get("max_retries", 3)
         self.max_tokens = kwargs.get("max_tokens", 1500)

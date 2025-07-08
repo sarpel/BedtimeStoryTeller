@@ -226,6 +226,9 @@ class StorytellingAgent:
         time_to_first_sound_start = time.time()
         first_sound_played = False
         
+        # Initialize variables that may be used in exception handler
+        tts_tasks = []
+        
         try:
             self._set_state(AgentState.GENERATING)
             
@@ -255,7 +258,6 @@ class StorytellingAgent:
             self.playback_task = asyncio.create_task(self._audio_playback_loop())
             
             # Start story generation and TTS processing
-            tts_tasks = []
             
             async for paragraph in llm_provider.generate_story_stream(story_request):
                 session.paragraphs_generated += 1
