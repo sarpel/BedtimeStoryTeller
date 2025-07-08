@@ -1,0 +1,189 @@
+[SUCCESS] Initial tests completed
+[SUCCESS] Installation completed successfully!
+
+Next Steps:
+1. Edit the configuration file:
+   sudo nano /home/pi/BedtimeStoryTeller/.env
+
+2. Add your API keys:
+   - OPENAI_API_KEY (required)
+   - PORCUPINE_ACCESS_KEY (required for wake word)
+
+3. Start the service:
+   sudo systemctl start storyteller
+
+4. Check service status:
+   sudo systemctl status storyteller
+
+5. View logs:
+   sudo journalctl -u storyteller -f
+
+6. Access web interface:
+   http://192.168.1.48/
+
+7. Test the system:
+   sudo -u pi /home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main test
+
+pi@DietPi:~/BedtimeStoryTeller$ sudo systemctl start storyteller
+pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
+Jul 08 21:40:54 DietPi storyteller[3639]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:40:54 DietPi storyteller[3639]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:40:54 DietPi storyteller[3639]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:40:54 DietPi storyteller[3639]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:40:54 DietPi storyteller[3639]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:40:54 DietPi storyteller[3639]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:40:54 DietPi storyteller[3639]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:40:55 DietPi systemd[1]: storyteller.service: Consumed 1.380s CPU time.
+Jul 08 21:41:05 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 1.
+Jul 08 21:41:05 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:41:05 DietPi systemd[1]: storyteller.service: Consumed 1.380s CPU time.
+Jul 08 21:41:05 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:41:06 DietPi storyteller[3646]: Traceback (most recent call last):
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "<frozen runpy>", line 198, in _run_module_as_main
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "<frozen runpy>", line 88, in _run_code
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
+Jul 08 21:41:06 DietPi storyteller[3646]:     from .web.app import create_app
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
+Jul 08 21:41:06 DietPi storyteller[3646]:     web_app = WebApplication()
+Jul 08 21:41:06 DietPi storyteller[3646]:               ^^^^^^^^^^^^^^^^
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:41:06 DietPi storyteller[3646]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:41:06 DietPi storyteller[3646]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:41:06 DietPi storyteller[3646]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:41:06 DietPi storyteller[3646]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:41:06 DietPi storyteller[3646]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:41:06 DietPi storyteller[3646]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:41:06 DietPi systemd[1]: storyteller.service: Consumed 1.484s CPU time.
+Jul 08 21:41:16 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 2.
+Jul 08 21:41:16 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:41:16 DietPi systemd[1]: storyteller.service: Consumed 1.484s CPU time.
+Jul 08 21:41:16 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:41:17 DietPi storyteller[3650]: Traceback (most recent call last):
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "<frozen runpy>", line 198, in _run_module_as_main
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "<frozen runpy>", line 88, in _run_code
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
+Jul 08 21:41:17 DietPi storyteller[3650]:     from .web.app import create_app
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
+Jul 08 21:41:17 DietPi storyteller[3650]:     web_app = WebApplication()
+Jul 08 21:41:17 DietPi storyteller[3650]:               ^^^^^^^^^^^^^^^^
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:41:17 DietPi storyteller[3650]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:41:17 DietPi storyteller[3650]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:41:17 DietPi storyteller[3650]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:41:17 DietPi storyteller[3650]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:41:17 DietPi storyteller[3650]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:41:17 DietPi storyteller[3650]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:41:17 DietPi systemd[1]: storyteller.service: Consumed 1.197s CPU time.
+Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 3.
+Jul 08 21:41:27 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Consumed 1.197s CPU time.
+Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Start request repeated too quickly.
+Jul 08 21:41:27 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:41:27 DietPi systemd[1]: Failed to start storyteller.service - Bedtime Storyteller Service.
+^C
+pi@DietPi:~/BedtimeStoryTeller$ git pull
+Already up to date.
+pi@DietPi:~/BedtimeStoryTeller$ git pull
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 10 (delta 4), reused 10 (delta 4), pack-reused 0 (from 0)
+Unpacking objects: 100% (10/10), 10.35 KiB | 3.45 MiB/s, done.
+From https://github.com/sarpel/BedtimeStoryTeller
+   b6517a0..f142caa  main       -> origin/main
+Updating b6517a0..f142caa
+Fast-forward
+ CLAUDE.md                  | Bin 0 -> 7420 bytes
+ demonstrate_fix.py         | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ pyproject.toml             |   1 +
+ quick_fix_main.py          | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ requirements.txt           |   1 +
+ test_audio_fix.py          | 144 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ test_core_functionality.py | 203 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ test_simple.py             | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 707 insertions(+)
+ create mode 100644 CLAUDE.md
+ create mode 100644 demonstrate_fix.py
+ create mode 100644 quick_fix_main.py
+ create mode 100644 test_audio_fix.py
+ create mode 100644 test_core_functionality.py
+ create mode 100644 test_simple.py
+pi@DietPi:~/BedtimeStoryTeller$ sudo systemctl restart storyteller
+pi@DietPi:~/BedtimeStoryTeller$ sudo journalctl -u storyteller -f
+Jul 08 21:48:03 DietPi storyteller[3683]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:48:03 DietPi storyteller[3683]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:48:03 DietPi storyteller[3683]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:03 DietPi storyteller[3683]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:48:03 DietPi storyteller[3683]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:48:03 DietPi storyteller[3683]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:03 DietPi storyteller[3683]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:48:03 DietPi systemd[1]: storyteller.service: Consumed 1.434s CPU time.
+Jul 08 21:48:14 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 1.
+Jul 08 21:48:14 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:48:14 DietPi systemd[1]: storyteller.service: Consumed 1.434s CPU time.
+Jul 08 21:48:14 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:48:15 DietPi storyteller[3690]: Traceback (most recent call last):
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "<frozen runpy>", line 198, in _run_module_as_main
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "<frozen runpy>", line 88, in _run_code
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
+Jul 08 21:48:15 DietPi storyteller[3690]:     from .web.app import create_app
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
+Jul 08 21:48:15 DietPi storyteller[3690]:     web_app = WebApplication()
+Jul 08 21:48:15 DietPi storyteller[3690]:               ^^^^^^^^^^^^^^^^
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:48:15 DietPi storyteller[3690]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:48:15 DietPi storyteller[3690]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:15 DietPi storyteller[3690]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:48:15 DietPi storyteller[3690]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:48:15 DietPi storyteller[3690]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:15 DietPi storyteller[3690]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:48:15 DietPi systemd[1]: storyteller.service: Consumed 1.505s CPU time.
+Jul 08 21:48:25 DietPi systemd[1]: storyteller.service: Scheduled restart job, restart counter is at 2.
+Jul 08 21:48:25 DietPi systemd[1]: Stopped storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:48:25 DietPi systemd[1]: storyteller.service: Consumed 1.505s CPU time.
+Jul 08 21:48:25 DietPi systemd[1]: Started storyteller.service - Bedtime Storyteller Service.
+Jul 08 21:48:26 DietPi storyteller[3694]: Traceback (most recent call last):
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "<frozen runpy>", line 198, in _run_module_as_main
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "<frozen runpy>", line 88, in _run_code
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
+Jul 08 21:48:26 DietPi storyteller[3694]:     from .web.app import create_app
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
+Jul 08 21:48:26 DietPi storyteller[3694]:     web_app = WebApplication()
+Jul 08 21:48:26 DietPi storyteller[3694]:               ^^^^^^^^^^^^^^^^
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+Jul 08 21:48:26 DietPi storyteller[3694]:     self.templates = Jinja2Templates(directory="storyteller/web/templates")
+Jul 08 21:48:26 DietPi storyteller[3694]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:26 DietPi storyteller[3694]:   File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+Jul 08 21:48:26 DietPi storyteller[3694]:     assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+Jul 08 21:48:26 DietPi storyteller[3694]:            ^^^^^^^^^^^^^^^^^^
+Jul 08 21:48:26 DietPi storyteller[3694]: AssertionError: jinja2 must be installed to use Jinja2Templates
+Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Main process exited, code=exited, status=1/FAILURE
+Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Failed with result 'exit-code'.
+Jul 08 21:48:26 DietPi systemd[1]: storyteller.service: Consumed 1.179s CPU time.
+^C
+pi@DietPi:~/BedtimeStoryTeller$ sudo -u pi /home/pi/BedtimeStoryTeller/venv/bin/python -m storyteller.main test
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/pi/BedtimeStoryTeller/storyteller/main.py", line 42, in <module>
+    from .web.app import create_app
+  File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 402, in <module>
+    web_app = WebApplication()
+              ^^^^^^^^^^^^^^^^
+  File "/home/pi/BedtimeStoryTeller/storyteller/web/app.py", line 76, in __init__
+    self.templates = Jinja2Templates(directory="storyteller/web/templates")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/BedtimeStoryTeller/venv/lib/python3.11/site-packages/starlette/templating.py", line 96, in __init__
+    assert jinja2 is not None, "jinja2 must be installed to use Jinja2Templates"
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: jinja2 must be installed to use Jinja2Templates

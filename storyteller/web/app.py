@@ -123,7 +123,7 @@ class WebApplication:
                 # Get hardware status
                 hardware_status = {}
                 if self.agent.hardware_manager:
-                    hardware_status = await self.agent.hardware_manager.get_status()
+                    hardware_status = self.agent.hardware_manager.get_hardware_info()
                 
                 # Get provider status
                 provider_status = {}

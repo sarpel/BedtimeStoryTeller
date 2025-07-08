@@ -305,13 +305,14 @@ class StoryLibrary:
         except Exception as e:
             logger.error(f"Failed to complete session {session_id}: {e}")
     
-    async def get_recent_sessions(self, limit: int = 20) -> List[StorySession]:
+    async def get_recent_sessions(self, limit: int = 20, offset: int = 0) -> List[StorySession]:
         """Get recent story sessions."""
         try:
             result = await self.session.execute(
                 select(StorySession)
                 .options(selectinload(StorySession.story))
                 .order_by(desc(StorySession.start_time))
+                .offset(offset)
                 .limit(limit)
             )
             return result.scalars().all()
