@@ -1,0 +1,46 @@
+[Unit]
+Description=Bedtime Storyteller Service (Simple)
+Documentation=https://github.com/sarpel/BedtimeStoryTeller
+After=network.target sound.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/BedtimeStoryTeller
+Environment=PATH=/root/BedtimeStoryTeller/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/root/BedtimeStoryTeller
+Environment=FORCE_MOCK_HARDWARE=true
+ExecStart=/root/BedtimeStoryTeller/venv/bin/python -m storyteller.simple_main
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+
+# Simplified security settings
+NoNewPrivileges=true
+
+# Hardware access for GPIO and audio (optional)
+DeviceAllow=/dev/gpiomem rw
+DeviceAllow=/dev/snd/* rw
+SupplementaryGroups=audio gpio
+
+# Resource limits
+MemoryMax=400M
+TasksMax=100
+LimitNOFILE=1024
+
+# Restart configuration
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=storyteller
+
+[Install]
+WantedBy=multi-user.target
