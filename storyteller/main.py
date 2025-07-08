@@ -331,6 +331,43 @@ class StorytellerApplication:
         try:
             logger.info("Initializing wakeword engine...")
             
+            # Check if we have real audio hardware
+            if self.settings.force_mock_hardware:
+                logger.info("Mock hardware forced - skipping wakeword engine initialization")
+                return
+                
+            # Check if audio device is mock (no real audio hardware)
+            if self.hardware_manager.audio and hasattr(self.hardware_manager.audio, '__class__'):
+                if 'Mock' in self.hardware_manager.audio.__class__.__name__:
+                    logger.info("Mock audio device detected - skipping wakeword engine initialization")
+                    return
+            
+            # Test if audio devices are available before initializing wake word engine
+            try:
+                import pyaudio
+                test_audio = pyaudio.PyAudio()
+                device_count = test_audio.get_device_count()
+                
+                # Check if any input devices exist
+                input_devices = 0
+                for i in range(device_count):
+                    try:
+                        device_info = test_audio.get_device_info_by_index(i)
+                        if device_info["maxInputChannels"] > 0:
+                            input_devices += 1
+                    except:
+                        continue
+                
+                test_audio.terminate()
+                
+                if input_devices == 0:
+                    logger.warning("No audio input devices found - skipping wakeword engine initialization")
+                    return
+                    
+            except Exception as audio_test_error:
+                logger.warning(f"Audio device test failed: {audio_test_error} - skipping wakeword engine")
+                return
+            
             # Prepare wakeword config
             wakeword_config = {
                 "engine_name": self.settings.wakeword_engine
@@ -354,7 +391,8 @@ class StorytellerApplication:
             
         except Exception as e:
             logger.error(f"Wakeword initialization failed: {e}")
-            raise
+            logger.warning("Continuing without wakeword engine - wake words will not be available")
+            # Don't raise - allow system to continue without wakeword engine
     
     def _on_button_press(self, event) -> None:
         """Handle GPIO button press."""
@@ -469,9 +507,13 @@ class StorytellerApplication:
         try:
             logger.info("Starting Bedtime Storyteller service...")
             
-            # Start listening for wake words
+            # Start listening for wake words if available
             if self.agent:
-                await self.agent.start_listening()
+                try:
+                    await self.agent.start_listening()
+                except Exception as listen_error:
+                    logger.warning(f"Failed to start wake word listening: {listen_error}")
+                    logger.info("Service running without wake word detection - use button or web interface")
             
             logger.info("Bedtime Storyteller is running. Press Ctrl+C to stop.")
             
