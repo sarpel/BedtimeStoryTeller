@@ -8,12 +8,30 @@ import logging
 import subprocess
 import os
 from typing import Optional, Dict, Any, AsyncGenerator
-import pyaudio
-import wave
-import io
 import threading
 from queue import Queue, Empty
-import numpy as np
+
+# Optional imports for audio hardware
+try:
+    import pyaudio
+    PYAUDIO_AVAILABLE = True
+except ImportError:
+    pyaudio = None
+    PYAUDIO_AVAILABLE = False
+
+try:
+    import wave
+    WAVE_AVAILABLE = True
+except ImportError:
+    wave = None
+    WAVE_AVAILABLE = False
+
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    np = None
+    NUMPY_AVAILABLE = False
 
 from .interface import AudioInterface, AudioConfig, AudioFormat, AudioChunk, AudioDeviceType
 from ..config.hardware_profiles import detect_pi_model, PiModel
@@ -36,6 +54,10 @@ class IQAudioDevice(AudioInterface):
         """Initialize IQAudio Codec."""
         try:
             logger.info("Initializing IQAudio Codec...")
+            
+            # Check if PyAudio is available
+            if not PYAUDIO_AVAILABLE:
+                raise RuntimeError("PyAudio not available - install python3-pyaudio")
             
             # Initialize PyAudio
             self.audio = pyaudio.PyAudio()
@@ -370,6 +392,10 @@ class USBAudioDevice(AudioInterface):
         try:
             logger.info("Initializing USB Audio device...")
             
+            # Check if PyAudio is available
+            if not PYAUDIO_AVAILABLE:
+                raise RuntimeError("PyAudio not available - install python3-pyaudio")
+            
             # Initialize PyAudio
             self.audio = pyaudio.PyAudio()
             
@@ -696,6 +722,10 @@ async def create_audio_device(config: AudioConfig) -> AudioInterface:
         return IQAudioDevice(config)
     elif config.device_type == AudioDeviceType.USB_AUDIO:
         return USBAudioDevice(config)
+    elif config.device_type == AudioDeviceType.SYSTEM_DEFAULT:
+        # Use mock device for system default when no audio hardware
+        logger.info("System default audio requested, using mock device as fallback")
+        return MockAudioDevice(config)
     else:
         # Auto-detect based on Pi model
         pi_model = detect_pi_model()

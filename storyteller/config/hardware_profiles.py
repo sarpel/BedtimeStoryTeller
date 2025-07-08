@@ -264,7 +264,8 @@ def detect_hardware_profile() -> HardwareProfile:
         if audio_devices.get("usb_audio_detected"):
             profile_key = "pi_5_usb_audio"
         else:
-            profile_key = "pi_4_hdmi"  # Fallback to HDMI audio
+            # Use fallback profile for Pi 5 without USB audio
+            profile_key = "fallback"
             
     elif pi_model == PiModel.PI_4:
         profile_key = "pi_4_hdmi"

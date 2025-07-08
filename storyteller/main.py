@@ -10,8 +10,15 @@ import sys
 import os
 from pathlib import Path
 from typing import Optional
-import click
 from contextlib import asynccontextmanager
+
+# Optional import for CLI functionality
+try:
+    import click
+    CLICK_AVAILABLE = True
+except ImportError:
+    click = None
+    CLICK_AVAILABLE = False
 
 from .config.settings import get_settings, reload_settings
 from .config.hardware_profiles import detect_hardware_profile
@@ -138,37 +145,100 @@ class StorytellerApplication:
             hardware_profile = detect_hardware_profile()
             logger.info(f"Detected hardware profile: {hardware_profile.model.value}")
             
-            # Create audio device
-            audio_device = await create_audio_device(hardware_profile.audio)
-            await audio_device.initialize()
+            # Create audio device with fallback
+            audio_device = None
             
-            # Create GPIO manager
-            gpio_manager = await create_gpio_manager()
-            await gpio_manager.initialize()
+            # Check if mock hardware is forced
+            if self.settings.force_mock_hardware:
+                logger.info("Mock hardware forced via configuration")
+                from .hal.audio_devices import MockAudioDevice
+                audio_device = MockAudioDevice(hardware_profile.audio)
+                await audio_device.initialize()
+                logger.info("Mock audio device initialized (forced)")
+            else:
+                try:
+                    audio_device = await create_audio_device(hardware_profile.audio)
+                    await audio_device.initialize()
+                    logger.info("Audio device initialized successfully")
+                except Exception as audio_error:
+                    logger.warning(f"Audio initialization failed: {audio_error}")
+                    logger.info("Falling back to mock audio device...")
+                    
+                    # Import here to avoid circular import
+                    from .hal.audio_devices import MockAudioDevice
+                    
+                    # Create mock audio device with same config
+                    audio_device = MockAudioDevice(hardware_profile.audio)
+                    await audio_device.initialize()
+                    logger.info("Mock audio device initialized (no audio hardware)")
             
-            # Setup GPIO components
-            if hasattr(gpio_manager, 'setup_button'):
-                # Setup trigger button
-                if hardware_profile.gpio.button_pin:
-                    await gpio_manager.setup_button(
-                        hardware_profile.gpio.button_pin,
-                        self._on_button_press,
-                        pull_up=hardware_profile.gpio.button_pull_up,
-                        bounce_time=hardware_profile.gpio.button_bounce_time
-                    )
-                
-                # Setup status LED
-                if hardware_profile.gpio.led_pin:
-                    await gpio_manager.setup_led(hardware_profile.gpio.led_pin)
+            # Create GPIO manager with fallback
+            gpio_manager = None
+            
+            # Check if mock hardware is forced
+            if self.settings.force_mock_hardware:
+                logger.info("Mock GPIO forced via configuration")
+                from .hal.gpio_manager import MockGPIOManager
+                gpio_manager = MockGPIOManager()
+                await gpio_manager.initialize()
+                logger.info("Mock GPIO manager initialized (forced)")
+            else:
+                try:
+                    gpio_manager = await create_gpio_manager()
+                    await gpio_manager.initialize()
+                    logger.info("GPIO manager initialized successfully")
+                except Exception as gpio_error:
+                    logger.warning(f"GPIO initialization failed: {gpio_error}")
+                    logger.info("Continuing without GPIO support...")
+                    
+                    # Import here to avoid circular import
+                    from .hal.gpio_manager import MockGPIOManager
+                    
+                    # Create mock GPIO manager
+                    gpio_manager = MockGPIOManager()
+                    await gpio_manager.initialize()
+                    logger.info("Mock GPIO manager initialized (no GPIO hardware)")
+            
+            # Setup GPIO components if available
+            if gpio_manager and hasattr(gpio_manager, 'setup_button'):
+                try:
+                    # Setup trigger button
+                    if hardware_profile.gpio.button_pin:
+                        await gpio_manager.setup_button(
+                            hardware_profile.gpio.button_pin,
+                            self._on_button_press,
+                            pull_up=hardware_profile.gpio.button_pull_up,
+                            bounce_time=hardware_profile.gpio.button_bounce_time
+                        )
+                    
+                    # Setup status LED
+                    if hardware_profile.gpio.led_pin:
+                        await gpio_manager.setup_led(hardware_profile.gpio.led_pin)
+                except Exception as setup_error:
+                    logger.warning(f"GPIO setup failed: {setup_error}")
             
             # Initialize hardware manager
             await self.hardware_manager.initialize(audio_device, gpio_manager)
             
-            logger.info("Hardware initialized")
+            logger.info("Hardware initialized (with fallbacks if needed)")
             
         except Exception as e:
-            logger.error(f"Hardware initialization failed: {e}")
-            raise
+            logger.error(f"Hardware initialization failed completely: {e}")
+            # Don't raise - allow system to continue without hardware
+            logger.warning("Continuing without hardware support...")
+            
+            # Initialize with all mock devices
+            from .hal.audio_devices import MockAudioDevice
+            from .hal.gpio_manager import MockGPIOManager
+            
+            mock_audio = MockAudioDevice(hardware_profile.audio if 'hardware_profile' in locals() else None)
+            mock_gpio = MockGPIOManager()
+            
+            await mock_audio.initialize()
+            await mock_gpio.initialize()
+            await self.hardware_manager.initialize(mock_audio, mock_gpio)
+            
+            logger.info("All mock hardware initialized")
     
     async def _initialize_providers(self) -> None:
         """Initialize AI service providers."""
@@ -421,18 +491,24 @@ class StorytellerApplication:
 
 
 # CLI Interface
+if CLICK_AVAILABLE:
+    @click.group()
+    @click.version_option(version="0.1.0")
+    def cli():
+        """Bedtime Storyteller - AI-powered storytelling for children."""
+        pass
+else:
+    def cli():
+        """Dummy CLI function when click is not available."""
+        print("Click library not available. Install with: pip install click")
+        return
 
-@click.group()
-@click.version_option(version="0.1.0")
-def cli():
-    """Bedtime Storyteller - AI-powered storytelling for children."""
-    pass
 
-
-@cli.command()
-@click.option('--daemon', '-d', is_flag=True, help='Run as daemon service')
-@click.option('--config', '-c', help='Configuration file path')
-def run(daemon: bool, config: Optional[str]) -> None:
+if CLICK_AVAILABLE:
+    @cli.command()
+    @click.option('--daemon', '-d', is_flag=True, help='Run as daemon service')
+    @click.option('--config', '-c', help='Configuration file path')
+    def run(daemon: bool, config: Optional[str]) -> None:
     """Run the storyteller service."""
     try:
         # Reload settings if config file specified

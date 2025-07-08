@@ -101,6 +101,9 @@ class Settings(BaseSettings):
         default=3, env="MAX_CONCURRENT_TTS_REQUESTS"
     )
     
+    # Hardware configuration
+    force_mock_hardware: bool = Field(default=False, env="FORCE_MOCK_HARDWARE")
+    
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
