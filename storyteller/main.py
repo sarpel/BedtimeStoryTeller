@@ -36,6 +36,16 @@ from .utils.safety_filter import SafetyFilter
 from .storage.models import create_database_engine, create_tables, get_database_session, init_default_preferences
 from .storage.story_library import StoryLibrary
 
+# Web interface
+try:
+    import uvicorn
+    from .web.app import create_app
+    WEB_AVAILABLE = True
+except ImportError:
+    uvicorn = None
+    create_app = None
+    WEB_AVAILABLE = False
+
 # Setup logging with safe file handler
 def setup_logging():
     """Setup logging with fallback handlers for permission issues."""
@@ -83,6 +93,7 @@ class StorytellerApplication:
         self.agent: Optional[StorytellingAgent] = None
         self.database_engine = None
         self.story_library: Optional[StoryLibrary] = None
+        self.web_server_task: Optional[asyncio.Task] = None
         self.shutdown_event = asyncio.Event()
         
         # Setup signal handlers
@@ -111,6 +122,9 @@ class StorytellerApplication:
             # Initialize wakeword engine
             await self._initialize_wakeword()
             
+            # Initialize web interface
+            await self._initialize_web()
+            
             # Initialize agent
             self.agent = StorytellingAgent(
                 self.provider_manager,
@@ -124,6 +138,9 @@ class StorytellerApplication:
             self.agent.on_story_started = self._on_story_started
             self.agent.on_story_completed = self._on_story_completed
             self.agent.on_error = self._on_agent_error
+            
+            # Initialize web app with components
+            await self._initialize_web_components()
             
             logger.info("Bedtime Storyteller initialized successfully")
             
@@ -394,6 +411,56 @@ class StorytellerApplication:
             logger.warning("Continuing without wakeword engine - wake words will not be available")
             # Don't raise - allow system to continue without wakeword engine
     
+    async def _initialize_web(self) -> None:
+        """Initialize web interface."""
+        try:
+            if not WEB_AVAILABLE:
+                logger.warning("Web interface dependencies not available - skipping web server")
+                return
+                
+            logger.info("Initializing web interface...")
+            
+            # Create FastAPI app
+            app = create_app()
+            
+            # Configure uvicorn
+            config = uvicorn.Config(
+                app=app,
+                host="0.0.0.0",
+                port=5000,
+                log_level="info",
+                access_log=False  # Reduce log spam
+            )
+            
+            # Start web server in background
+            server = uvicorn.Server(config)
+            self.web_server_task = asyncio.create_task(server.serve())
+            
+            logger.info("Web interface started on http://0.0.0.0:5000")
+            
+        except Exception as e:
+            logger.error(f"Web interface initialization failed: {e}")
+            logger.warning("Continuing without web interface")
+            # Don't raise - allow system to continue without web interface
+    
+    async def _initialize_web_components(self) -> None:
+        """Initialize web application components after agent is ready."""
+        try:
+            if not WEB_AVAILABLE:
+                return
+                
+            # Import web app instance
+            from .web.app import web_app
+            
+            # Initialize web app with components
+            await web_app.initialize(self.agent, self.story_library)
+            
+            logger.info("Web application components initialized")
+            
+        except Exception as e:
+            logger.error(f"Web components initialization failed: {e}")
+            # Don't raise - web interface is optional
+    
     def _on_button_press(self, event) -> None:
         """Handle GPIO button press."""
         from .hal.interface import PinState
@@ -537,6 +604,14 @@ class StorytellerApplication:
             # Stop agent
             if self.agent:
                 await self.agent.cleanup()
+            
+            # Stop web server
+            if self.web_server_task:
+                self.web_server_task.cancel()
+                try:
+                    await self.web_server_task
+                except asyncio.CancelledError:
+                    pass
             
             # Clean up hardware
             if self.hardware_manager:
