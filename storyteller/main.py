@@ -509,183 +509,186 @@ if CLICK_AVAILABLE:
     @click.option('--daemon', '-d', is_flag=True, help='Run as daemon service')
     @click.option('--config', '-c', help='Configuration file path')
     def run(daemon: bool, config: Optional[str]) -> None:
-    """Run the storyteller service."""
-    try:
-        # Reload settings if config file specified
-        if config:
-            os.environ['STORYTELLER_CONFIG'] = config
-            reload_settings()
-        
-        # Create and run application
-        app = StorytellerApplication()
-        
-        if daemon:
-            # TODO: Implement proper daemon mode
-            logger.info("Daemon mode not fully implemented, running in foreground")
-        
-        # Run the application
-        async def run_app():
-            await app.initialize()
-            await app.run()
-        
-        asyncio.run(run_app())
-        
-    except KeyboardInterrupt:
-        logger.info("Interrupted by user")
-    except Exception as e:
-        logger.error(f"Application error: {e}")
-        sys.exit(1)
-
-
-@cli.command()
-@click.argument('prompt')
-@click.option('--language', '-l', default='tr', help='Story language (tr/en)')
-@click.option('--age', '-a', default='5+', help='Age rating')
-def tell(prompt: str, language: str, age: str) -> None:
-    """Tell a story with the given prompt."""
-    async def tell_story():
-        app = StorytellerApplication()
+        """Run the storyteller service."""
         try:
-            await app.initialize()
+            # Reload settings if config file specified
+            if config:
+                os.environ['STORYTELLER_CONFIG'] = config
+                reload_settings()
             
-            if app.agent:
-                await app.agent.tell_story(prompt, language=language, age_rating=age)
+            # Create and run application
+            app = StorytellerApplication()
             
+            if daemon:
+                # TODO: Implement proper daemon mode
+                logger.info("Daemon mode not fully implemented, running in foreground")
+            
+            # Run the application
+            async def run_app():
+                await app.initialize()
+                await app.run()
+            
+            asyncio.run(run_app())
+            
+        except KeyboardInterrupt:
+            logger.info("Interrupted by user")
         except Exception as e:
-            logger.error(f"Story telling failed: {e}")
-        finally:
-            await app.cleanup()
-    
-    try:
-        asyncio.run(tell_story())
-    except KeyboardInterrupt:
-        logger.info("Story interrupted by user")
+            logger.error(f"Application error: {e}")
+            sys.exit(1)
 
 
-@cli.command()
-def wake():
-    """Simulate a wake word detection for testing."""
-    async def simulate_wake():
-        app = StorytellerApplication()
+    @cli.command()
+    @click.argument('prompt')
+    @click.option('--language', '-l', default='tr', help='Story language (tr/en)')
+    @click.option('--age', '-a', default='5+', help='Age rating')
+    def tell(prompt: str, language: str, age: str) -> None:
+        """Tell a story with the given prompt."""
+        async def tell_story():
+            app = StorytellerApplication()
+            try:
+                await app.initialize()
+                
+                if app.agent:
+                    await app.agent.tell_story(prompt, language=language, age_rating=age)
+                
+            except Exception as e:
+                logger.error(f"Story telling failed: {e}")
+            finally:
+                await app.cleanup()
+        
         try:
-            await app.initialize()
-            
-            if app.agent:
-                # Simulate wake word detection
-                from .wakeword.loader import WakewordDetection
-                import time
-                
-                detection = WakewordDetection(
-                    keyword="test",
-                    confidence=1.0,
-                    timestamp=time.time(),
-                    engine_name="manual"
-                )
-                
-                app.agent._on_wake_word_detected(detection)
-                
-                # Wait a bit for the story to start
-                await asyncio.sleep(10)
-            
-        except Exception as e:
-            logger.error(f"Wake simulation failed: {e}")
-        finally:
-            await app.cleanup()
-    
-    try:
-        asyncio.run(simulate_wake())
-    except KeyboardInterrupt:
-        logger.info("Wake simulation interrupted")
+            asyncio.run(tell_story())
+        except KeyboardInterrupt:
+            logger.info("Story interrupted by user")
 
 
-@cli.command()
-def status():
-    """Show system status."""
-    async def show_status():
-        app = StorytellerApplication()
+if CLICK_AVAILABLE:
+    @cli.command()
+    def wake():
+        """Simulate a wake word detection for testing."""
+        async def simulate_wake():
+            app = StorytellerApplication()
+            try:
+                await app.initialize()
+                
+                if app.agent:
+                    # Simulate wake word detection
+                    from .wakeword.loader import WakewordDetection
+                    import time
+                    
+                    detection = WakewordDetection(
+                        keyword="test",
+                        confidence=1.0,
+                        timestamp=time.time(),
+                        engine_name="manual"
+                    )
+                    
+                    app.agent._on_wake_word_detected(detection)
+                    
+                    # Wait a bit for the story to start
+                    await asyncio.sleep(10)
+                
+            except Exception as e:
+                logger.error(f"Wake simulation failed: {e}")
+            finally:
+                await app.cleanup()
+        
         try:
-            await app.initialize()
-            
-            if app.agent:
-                status = app.agent.get_status()
-                
-                click.echo("=== Bedtime Storyteller Status ===")
-                click.echo(f"State: {status['state']}")
-                click.echo(f"Running: {status['is_running']}")
-                
-                if status.get('current_session'):
-                    session = status['current_session']
-                    click.echo(f"Current Session: {session['session_id']}")
-                    click.echo(f"Prompt: {session['prompt']}")
-                    click.echo(f"Status: {session['status']}")
-                
-                if status.get('wakeword_engine'):
-                    engine = status['wakeword_engine']
-                    click.echo(f"Wakeword Engine: {engine.get('engine_name', 'unknown')}")
-                    click.echo(f"Listening: {engine.get('is_listening', False)}")
-                
-                stats = status.get('stats', {})
-                click.echo(f"Sessions Completed: {stats.get('sessions_completed', 0)}")
-                click.echo(f"Stories Generated: {stats.get('total_stories_generated', 0)}")
-                click.echo(f"Wake Word Detections: {stats.get('wake_word_detections', 0)}")
-            
-        except Exception as e:
-            logger.error(f"Status check failed: {e}")
-        finally:
-            await app.cleanup()
-    
-    try:
-        asyncio.run(show_status())
-    except Exception as e:
-        click.echo(f"Error: {e}")
+            asyncio.run(simulate_wake())
+        except KeyboardInterrupt:
+            logger.info("Wake simulation interrupted")
 
 
-@cli.command()
-def test():
-    """Run system tests."""
-    async def run_tests():
-        app = StorytellerApplication()
+if CLICK_AVAILABLE:
+    @cli.command()
+    def status():
+        """Show system status."""
+        async def show_status():
+            app = StorytellerApplication()
+            try:
+                await app.initialize()
+                
+                if app.agent:
+                    status = app.agent.get_status()
+                    
+                    click.echo("=== Bedtime Storyteller Status ===")
+                    click.echo(f"State: {status['state']}")
+                    click.echo(f"Running: {status['is_running']}")
+                    
+                    if status.get('current_session'):
+                        session = status['current_session']
+                        click.echo(f"Current Session: {session['session_id']}")
+                        click.echo(f"Prompt: {session['prompt']}")
+                        click.echo(f"Status: {session['status']}")
+                    
+                    if status.get('wakeword_engine'):
+                        engine = status['wakeword_engine']
+                        click.echo(f"Wakeword Engine: {engine.get('engine_name', 'unknown')}")
+                        click.echo(f"Listening: {engine.get('is_listening', False)}")
+                    
+                    stats = status.get('stats', {})
+                    click.echo(f"Sessions Completed: {stats.get('sessions_completed', 0)}")
+                    click.echo(f"Stories Generated: {stats.get('total_stories_generated', 0)}")
+                    click.echo(f"Wake Word Detections: {stats.get('wake_word_detections', 0)}")
+                
+            except Exception as e:
+                logger.error(f"Status check failed: {e}")
+            finally:
+                await app.cleanup()
+        
         try:
-            await app.initialize()
-            
-            click.echo("=== Hardware Test ===")
-            if app.hardware_manager:
-                test_results = await app.hardware_manager.test_hardware()
-                
-                for component, results in test_results.items():
-                    click.echo(f"{component.title()}:")
-                    for test, result in results.items():
-                        if isinstance(result, bool):
-                            status = "✓" if result else "✗"
-                            click.echo(f"  {test}: {status}")
-                        else:
-                            click.echo(f"  {test}: {result}")
-            
-            click.echo("\n=== Provider Test ===")
-            if app.provider_manager:
-                health = await app.provider_manager.health_check()
-                
-                overall = health.get('overall_status', 'unknown')
-                click.echo(f"Overall Status: {overall}")
-                
-                for provider_type, providers in health.items():
-                    if provider_type != 'overall_status' and isinstance(providers, dict):
-                        click.echo(f"{provider_type.title()}:")
-                        for name, status in providers.items():
-                            if isinstance(status, dict):
-                                status_val = status.get('status', 'unknown')
-                                click.echo(f"  {name}: {status_val}")
-            
+            asyncio.run(show_status())
         except Exception as e:
-            logger.error(f"System test failed: {e}")
-            click.echo(f"Test failed: {e}")
-        finally:
-            await app.cleanup()
-    
-    try:
-        asyncio.run(run_tests())
-    except Exception as e:
-        click.echo(f"Error: {e}")
+            click.echo(f"Error: {e}")
+
+
+if CLICK_AVAILABLE:
+    @cli.command()
+    def test():
+        """Run system tests."""
+        async def run_tests():
+            app = StorytellerApplication()
+            try:
+                await app.initialize()
+                
+                click.echo("=== Hardware Test ===")
+                if app.hardware_manager:
+                    test_results = await app.hardware_manager.test_hardware()
+                    
+                    for component, results in test_results.items():
+                        click.echo(f"{component.title()}:")
+                        for test, result in results.items():
+                            if isinstance(result, bool):
+                                status = "✓" if result else "✗"
+                                click.echo(f"  {test}: {status}")
+                            else:
+                                click.echo(f"  {test}: {result}")
+                
+                click.echo("\n=== Provider Test ===")
+                if app.provider_manager:
+                    health = await app.provider_manager.health_check()
+                    
+                    overall = health.get('overall_status', 'unknown')
+                    click.echo(f"Overall Status: {overall}")
+                    
+                    for provider_type, providers in health.items():
+                        if provider_type != 'overall_status' and isinstance(providers, dict):
+                            click.echo(f"{provider_type.title()}:")
+                            for name, status in providers.items():
+                                if isinstance(status, dict):
+                                    status_val = status.get('status', 'unknown')
+                                    click.echo(f"  {name}: {status_val}")
+                
+            except Exception as e:
+                logger.error(f"System test failed: {e}")
+                click.echo(f"Test failed: {e}")
+            finally:
+                await app.cleanup()
+        
+        try:
+            asyncio.run(run_tests())
+        except Exception as e:
+            click.echo(f"Error: {e}")
 
 
 def main():
